@@ -209,6 +209,7 @@ struct ToastView: View {
     var body: some View {
         HStack(spacing: 14) {
             Text(toast.text).frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityAddTraits(.updatesFrequently)
             if toast.undo != nil {
                 Button("Undo") { app.undoAreaChange() }
                     .buttonStyle(.plain)
@@ -227,8 +228,8 @@ struct ToastView: View {
         .background(theme[.text], in: RoundedRectangle(cornerRadius: 10))
         .shadow(color: theme[.shadow], radius: 16, y: 12)
         .onHover { $0 ? app.holdToast() : app.resumeToast() }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isStaticText)
+        // Keep the Undo button its own element so VoiceOver (and UI tests) can reach it.
+        .accessibilityElement(children: .contain)
     }
 }
 
