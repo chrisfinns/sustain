@@ -59,12 +59,26 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.chrisfinns.sustain.tests
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Sustain.app/Contents/MacOS/Sustain"
         BUNDLE_LOADER: "$(TEST_HOST)"
+  SustainUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: AppUITests
+    dependencies:
+      - target: Sustain
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.chrisfinns.sustain.uitests
+        TEST_TARGET_NAME: Sustain
 schemes:
   Sustain:
     build:
       targets:
         Sustain: all
         SustainTests: [test]
+        SustainUITests: [test]
     test:
       targets:
         - SustainTests
+        - SustainUITests

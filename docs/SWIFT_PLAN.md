@@ -9,6 +9,24 @@ What it builds on:
 
 This replaces the Delivery, Stack, Structure, Roadmap and Verification sections of `docs/PLAN.md`, which describe the old PWA.
 
+## Status (Oct 6)
+M0 is underway on `claude/gallant-gauss-7axdni`; CI builds and tests both the Linux Core package and the macOS app.
+
+- **Done:**
+  - **SustainCore:** FSRS port matching ts-fsrs on 1,566 golden steps; Today queue, lanes, streak and heatmap; area rules; Paper & Ink theme matching the mockup's tokens, plus the contrast gate; link parsing; backup format v1.
+  - **Store:** SwiftData SchemaV1, seeding, media files, area/item/practice stores.
+  - **Screens:** shell and sidebar, Today, Capture, practice card (with the YouTube A–B loop and speed), Library, Settings with JSON export, and a Debug › YouTube Test window.
+- **Waiting on Chris:** run the YouTube test on his Mac and paste the report (see `README.md`).
+- **Next:** UI tests for the keyboard flows on CI, CI screenshots of each screen to compare with the mockup, then a week of daily use.
+
+Small deviations made while building M0. Revisit if they feel wrong in use:
+- **YouTube player:** uses `WKWebView`, the known-good path. SwiftUI's `WebView` can replace it later.
+- **Shell:** a fixed 232 pt sidebar in an `HStack`, matching the mockup exactly, instead of `NavigationSplitView`.
+- **Deleting an item:** asks for confirmation instead of offering an Undo toast. Area deletes do have Undo.
+- **PDF and Takes tabs:** list the attached files and open them in Preview or Music until the built-in viewers land in M1. The Images tab is a real grid.
+- **Notes:** the "Type / to insert…" hint is hidden until the `/` menu exists (M1).
+- **Pasting screenshots in Capture:** done with a "+ Screenshot" button that reads the clipboard. ⌘V inside the text box pastes text only.
+
 ## Tech decisions
 
 | Topic | Decision |
