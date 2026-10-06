@@ -1,0 +1,226 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Capture.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "title": "3 · Capture",
+      "w": 1440,
+      "x": 0,
+      "y": 1080
+    },
+    "CaptureNew.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "title": "3b · Capture: new area",
+      "w": 1440,
+      "x": 3040,
+      "y": 1080
+    },
+    "Colors-circuit-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Circuit · dark",
+      "w": 1440,
+      "x": 3040,
+      "y": 0
+    },
+    "Colors-circuit-light.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Circuit · light",
+      "w": 1440,
+      "x": 3040,
+      "y": 1020
+    },
+    "Colors-console-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Analog Console · dark",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "Colors-console-light.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Analog Console · light",
+      "w": 1440,
+      "x": 1520,
+      "y": 1020
+    },
+    "Colors-paper-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Paper & Ink · dark",
+      "w": 1440,
+      "x": 4560,
+      "y": 0
+    },
+    "Colors-paper-light.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Paper & Ink · light",
+      "w": 1440,
+      "x": 4560,
+      "y": 1020
+    },
+    "Colors-studio-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Studio Night · dark",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "Colors-studio-light.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "colors",
+      "title": "Studio Night · light",
+      "w": 1440,
+      "x": 0,
+      "y": 1020
+    },
+    "Library.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "title": "4 · Library",
+      "w": 1440,
+      "x": 1520,
+      "y": 1080
+    },
+    "Log.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "title": "6 · Practice log",
+      "w": 1440,
+      "x": 1520,
+      "y": 2100
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "title": "1 · Today",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "Notes.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "title": "7 · Notes",
+      "w": 1440,
+      "x": 0,
+      "y": 3220
+    },
+    "Practice.dc.html": {
+      "expand": "fill",
+      "h": 960,
+      "is_interactive": true,
+      "title": "2 · Practice card",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "Session.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "title": "5 · Session complete",
+      "w": 1440,
+      "x": 0,
+      "y": 2100
+    },
+    "Settings.dc.html": {
+      "expand": "fill",
+      "h": 1920,
+      "is_interactive": true,
+      "title": "8 · Settings",
+      "w": 1440,
+      "x": 1520,
+      "y": 3220
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-06T02:10:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas",
+    "page": "screens"
+  },
+  "notes": {
+    "colorsTitle": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "colors",
+      "text": "Color schemes · chosen: Paper & Ink (soft clay at night, red clay by day)",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "title": {
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "screens",
+      "text": "Sustain for Mac — clickable prototype (native SwiftUI app, Mac App Store)",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Practice.dc.html",
+    "Capture.dc.html",
+    "CaptureNew.dc.html",
+    "Library.dc.html",
+    "Session.dc.html",
+    "Log.dc.html",
+    "Notes.dc.html",
+    "Settings.dc.html",
+    "Colors-studio-dark.dc.html",
+    "Colors-console-dark.dc.html",
+    "Colors-circuit-dark.dc.html",
+    "Colors-paper-dark.dc.html",
+    "Colors-studio-light.dc.html",
+    "Colors-console-light.dc.html",
+    "Colors-circuit-light.dc.html",
+    "Colors-paper-light.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "screens",
+      "name": "Screens"
+    },
+    {
+      "id": "colors",
+      "name": "Color schemes"
+    }
+  ],
+  "title": "Sustain UI Mockup"
+}

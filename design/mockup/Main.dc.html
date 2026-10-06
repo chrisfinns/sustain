@@ -1,0 +1,2449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sustain prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; background: {{ t.bg }}; color: {{ t.text }}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif; font-size: 14px; line-height: 1.45; box-sizing: border-box">
+
+<!-- ============ SIDEBAR ============ -->
+<nav aria-label="Main" style="flex: 1 1 232px; box-sizing: border-box; background: {{ t.side }}; border-right: 1px solid {{ t.sideLine }}; padding: 20px 14px; display: flex; flex-direction: column; gap: 22px">
+  <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h3l2-6 3 12 3-9 2 5 1.5-2H22"></path></svg>
+    <span style="font-size: 18px; font-weight: 700; letter-spacing: -0.01em">Sustain</span>
+  </div>
+
+  <button onClick="{{ openCapture }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border-radius: 10px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600; width: 100%; box-sizing: border-box">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    <span style="flex: 1; text-align: left">Capture</span>
+    <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: 4px; border: 1px solid {{ t.onAccentLine }}">⌘K</span>
+  </button>
+
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <button onClick="{{ nav.today.go }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; background: {{ nav.today.bg }}; color: {{ nav.today.fg }}; font-weight: 500; width: 100%; text-align: left; box-sizing: border-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18M9 15l2 2 4-4"></path></svg>
+      <span style="flex: 1">Today</span>
+      <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px">{{ todayCount }}</span>
+    </button>
+    <button onClick="{{ nav.library.go }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; background: {{ nav.library.bg }}; color: {{ nav.library.fg }}; font-weight: 500; width: 100%; text-align: left; box-sizing: border-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17.5l9 5 9-5"></path></svg>
+      <span style="flex: 1">Library</span>
+      <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px">{{ libTotal }}</span>
+    </button>
+    <button onClick="{{ nav.notes.go }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; background: {{ nav.notes.bg }}; color: {{ nav.notes.fg }}; font-weight: 500; width: 100%; text-align: left; box-sizing: border-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+      <span style="flex: 1">Notes</span>
+    </button>
+    <button onClick="{{ nav.log.go }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; background: {{ nav.log.bg }}; color: {{ nav.log.fg }}; font-weight: 500; width: 100%; text-align: left; box-sizing: border-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M11 20V5M17 20v-6M3 20h18"></path></svg>
+      <span style="flex: 1">Log</span>
+    </button>
+    <button onClick="{{ nav.settings.go }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; background: {{ nav.settings.bg }}; color: {{ nav.settings.fg }}; font-weight: 500; width: 100%; text-align: left; box-sizing: border-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"></path><circle cx="15" cy="6" r="2"></circle><circle cx="9" cy="12" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg>
+      <span style="flex: 1">Settings</span>
+      <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; opacity: 0.8">⌘,</span>
+    </button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h2 style="margin: 0 0 6px; padding: 0 12px; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Instruments</h2>
+    <sc-for list="{{ instList }}" as="ins" hint-placeholder-count="6">
+      <button onClick="{{ ins.pick }}" aria-pressed="{{ ins.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 12px; min-height: 36px; padding: 0 12px; border-radius: 8px; background: {{ ins.bg }}; color: {{ ins.fg }}; width: 100%; text-align: left; box-sizing: border-box">
+        <span style="width: 9px; height: 9px; border-radius: 3px; background: {{ ins.color }}"></span>
+        <span style="flex: 1">{{ ins.name }}</span>
+        <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px">{{ ins.count }}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: auto; padding: 12px 14px; border-radius: 10px; background: {{ t.surf3 }}; font-size: 12px; color: {{ t.muted }}; display: flex; flex-direction: column; gap: 6px">
+    <span>Saved on this Mac only. No account.</span>
+    <button onClick="{{ nav.settings.go }}" style="appearance: none; border: 0; background: none; font: inherit; cursor: pointer; padding: 0; margin: 0; align-self: flex-start; color: {{ t.text }}; text-decoration: underline; font-size: 12px">Back up now</button>
+  </div>
+</nav>
+
+<!-- ============ MAIN ============ -->
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 28px 36px 40px; display: flex; flex-direction: column; gap: 24px">
+
+<!-- ---------- TODAY ---------- -->
+<sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 24px; max-width: 980px; width: 100%">
+  <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 13px; color: {{ t.muted }}">Tuesday, October 6</div>
+      <h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em">Today</h1>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: {{ t.muted }}">
+        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; background: {{ t.accentTint }}; color: {{ accent }}; font-size: 12px; font-weight: 600">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5 1-8.5z"></path></svg>
+          {{ streak }}-day streak
+        </span>
+      </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}">
+        <span style="padding: 0 8px; font-size: 12px; color: {{ t.muted }}">Time</span>
+        <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
+          <button onClick="{{ b.pick }}" aria-pressed="{{ b.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 7px; background: {{ b.bg }}; color: {{ b.fg }}; font-size: 13px; font-weight: 500">{{ b.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ startSession }}" disabled="{{ queueEmpty }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px; border-radius: 10px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600; opacity: {{ startOpacity }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"></path></svg>
+        Start session
+      </button>
+    </div>
+  </header>
+
+  <sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="padding: 28px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 18px; font-weight: 600">All caught up.</div>
+      <div style="color: {{ t.muted }}">Nothing else is due today. Capture something new, or come back tomorrow.</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasWarm }}" hint-placeholder-val="{{ true }}">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Warm-up</h2>
+      <sc-for list="{{ warm }}" as="it" hint-placeholder-count="2">
+        <button onClick="{{ it.open }}" style="appearance: none; font: inherit; color: inherit; cursor: pointer; margin: 0; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 56px; padding: 10px 16px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}; box-sizing: border-box">
+          <span style="display: flex; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box; border: 2px solid {{ it.ring }}; background: {{ it.fill }}"></span></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.title }}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{ t.muted }}"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ it.instColor }}"></span>{{ it.meta }}</span>
+          </span>
+          <span style="display: flex; align-items: center; gap: 12px">
+            <span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: {{ it.chipBg }}; color: {{ it.chipFg }}; white-space: nowrap">{{ it.chip }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ hasFocus }}" hint-placeholder-val="{{ true }}">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Focus</h2>
+      <sc-for list="{{ focus }}" as="it" hint-placeholder-count="2">
+        <button onClick="{{ it.open }}" style="appearance: none; font: inherit; color: inherit; cursor: pointer; margin: 0; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 56px; padding: 10px 16px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.accentLine }}; box-sizing: border-box">
+          <span style="display: flex; justify-content: center; color: {{ accent }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.title }}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{ t.muted }}"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ it.instColor }}"></span>{{ it.meta }}</span>
+          </span>
+          <span style="display: flex; align-items: center; gap: 12px">
+            <span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: {{ it.chipBg }}; color: {{ it.chipFg }}; white-space: nowrap">{{ it.chip }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ hasDue }}" hint-placeholder-val="{{ true }}">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Due · most overdue first</h2>
+      <sc-for list="{{ due }}" as="it" hint-placeholder-count="2">
+        <button onClick="{{ it.open }}" style="appearance: none; font: inherit; color: inherit; cursor: pointer; margin: 0; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 56px; padding: 10px 16px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}; box-sizing: border-box">
+          <span style="display: flex; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box; border: 2px solid {{ it.ring }}; background: {{ it.fill }}"></span></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.title }}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{ t.muted }}"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ it.instColor }}"></span>{{ it.meta }}</span>
+          </span>
+          <span style="display: flex; align-items: center; gap: 12px">
+            <span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: {{ it.chipBg }}; color: {{ it.chipFg }}; white-space: nowrap">{{ it.chip }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ hasFresh }}" hint-placeholder-val="{{ true }}">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">{{ newHeader }}</h2>
+      <sc-for list="{{ fresh }}" as="it" hint-placeholder-count="3">
+        <button onClick="{{ it.open }}" style="appearance: none; font: inherit; color: inherit; cursor: pointer; margin: 0; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 56px; padding: 10px 16px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}; box-sizing: border-box">
+          <span style="display: flex; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box; border: 2px solid {{ it.ring }}; background: {{ it.fill }}"></span></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.title }}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{ t.muted }}"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ it.instColor }}"></span>{{ it.meta }}</span>
+          </span>
+          <span style="display: flex; align-items: center; gap: 12px">
+            <span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: {{ it.chipBg }}; color: {{ it.chipFg }}; white-space: nowrap">{{ it.chip }}</span>
+          </span>
+        </button>
+      </sc-for>
+      <sc-if value="{{ hasWaiting }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size: 13px; color: {{ t.faint }}; padding: 2px 4px">{{ waitingText }}</div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ hasCut }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size: 13px; color: {{ t.muted }}; padding: 10px 14px; border-radius: 10px; border: 1px dashed {{ t.line4 }}">{{ cutText }}</div>
+  </sc-if>
+
+  <sc-if value="{{ hasDone }}" hint-placeholder-val="{{ true }}">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+        <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">{{ doneHeader }}</h2>
+        <button onClick="{{ toggleDone }}" style="appearance: none; border: 0; background: none; font: inherit; cursor: pointer; padding: 0 4px; margin: 0; min-height: 32px; color: {{ t.muted }}; font-size: 12px; text-decoration: underline">{{ doneToggleLabel }}</button>
+      </div>
+      <sc-if value="{{ showDone }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ done }}" as="it" hint-placeholder-count="2">
+          <div style="display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 48px; padding: 6px 12px 6px 16px; border-radius: 10px; background: {{ t.dim }}; border: 1px dashed {{ t.line2 }}; box-sizing: border-box">
+            <span style="display: flex; justify-content: center; color: {{ it.ratedColor }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>
+            <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+              <span style="font-size: 14px; font-weight: 600; color: {{ t.muted }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.title }}</span>
+              <span style="font-size: 12px; color: {{ t.faint }}">{{ it.meta }}</span>
+            </span>
+            <span style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end">
+              <span style="color: {{ it.ratedColor }}; font-weight: 600; font-size: 13px">{{ it.ratedLabel }}</span>
+              <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">next {{ it.nextLabel }}</span>
+              <button onClick="{{ it.rerate }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 10px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.muted }}; font-size: 12px">Re-rate</button>
+            </span>
+          </div>
+        </sc-for>
+      </sc-if>
+    </section>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ---------- PRACTICE CARD ---------- -->
+<sc-if value="{{ isPractice }}" hint-placeholder-val="{{ false }}">
+<div onKeyDown="{{ practiceKey }}" style="display: flex; flex-direction: column; gap: 18px; width: 100%">
+  <header style="display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px">
+      <button onClick="{{ goToday }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 12px 0 6px; border-radius: 8px; background: transparent; color: {{ t.muted }}; border: 1px solid {{ t.line2 }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+        Today
+      </button>
+      <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 320px; min-width: 0">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+          <h1 style="margin: 0; font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -0.015em">{{ cur.title }}</h1>
+          <div aria-label="Practice setting" style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 8px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}">
+            <sc-for list="{{ cardLanes }}" as="ln" hint-placeholder-count="3">
+              <button onClick="{{ ln.pick }}" aria-pressed="{{ ln.on }}" title="{{ ln.tip }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 28px; padding: 0 10px; border-radius: 6px; background: {{ ln.bg }}; color: {{ ln.fg }}; font-size: 12px; font-weight: 600">{{ ln.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: {{ t.muted }}; font-size: 13px">
+          <span style="width: 8px; height: 8px; border-radius: 2px; background: {{ cur.instColor }}"></span>{{ cur.instName }}
+          <span aria-hidden="true">·</span>
+          <button ref="{{ areaBtnRef }}" onClick="{{ toggleCardPicker }}" aria-expanded="{{ cardPickerOpen }}" aria-label="{{ cur.areaAria }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 0 9px; border-radius: 6px; background: transparent; border: 1px {{ cur.areaBorderStyle }} {{ t.line5 }}; color: {{ cur.areaFg }}; font-size: 13px"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{ cur.areaColor }}"></span>{{ cur.areaLabel }}</button>
+          <span>{{ cur.metaRest }}</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: {{ t.text }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ t.muted }}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>{{ elapsed }}
+        </span>
+        <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: {{ t.muted }}">{{ posText }}</span>
+        <button onClick="{{ endSession }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 14px; border-radius: 8px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}; font-size: 13px">End session</button>
+      </div>
+    </div>
+    <div style="height: 4px; border-radius: 2px; background: {{ t.track }}; overflow: hidden"><div style="height: 100%; width: {{ progress }}; background: {{ accent }}"></div></div>
+    <sc-if value="{{ cardPickerOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 680px; padding: 14px 16px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line3 }}">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+          <span style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Area <span style="font-weight: 400; color: {{ t.faint }}">· optional</span></span>
+          <div style="display: flex; gap: 8px">
+            <button onClick="{{ clearCardArea }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 30px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.muted }}; font-size: 12px">No area</button>
+            <button onClick="{{ toggleCardPicker }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 30px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}; font-size: 12px">Done</button>
+          </div>
+        </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+        <sc-for list="{{ pk.chips }}" as="ac" hint-placeholder-count="6">
+          <button onClick="{{ ac.pick }}" onMouseDown="{{ keepFocus }}" aria-pressed="{{ ac.on }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 12px; border-radius: 999px; background: {{ ac.bg }}; border: 1px {{ ac.borderStyle }} {{ ac.border }}; color: {{ ac.fg }}; font-size: 12px; font-weight: 500"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{ ac.color }}"></span>{{ ac.label }}</button>
+        </sc-for>
+        <input ref="{{ pickRef }}" aria-label="Type an area" maxlength="32" placeholder="+ Type an area…" value="{{ pk.text }}" onChange="{{ pk.setText }}" onKeyDown="{{ pk.onKey }}" role="combobox" aria-autocomplete="list" aria-expanded="{{ pk.open }}" aria-controls="{{ pk.listId }}" aria-activedescendant="{{ pk.activeId }}" style="flex: 1 1 160px; min-width: 140px; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px dashed {{ t.line6 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 12px; box-sizing: border-box">
+      </div>
+      <sc-if value="{{ pk.open }}" hint-placeholder-val="{{ false }}">
+        <div id="{{ pk.listId }}" role="listbox" aria-label="Area suggestions" style="display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 10px; background: {{ t.bg }}; border: 1px solid {{ t.line4 }}">
+          <sc-for list="{{ pk.rows }}" as="row" hint-placeholder-count="3">
+            <button id="{{ row.id }}" role="option" aria-selected="{{ row.on }}" tabindex="-1" onClick="{{ row.pick }}" onMouseDown="{{ keepFocus }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 0 10px; border-radius: 7px; background: {{ row.bg }}; box-shadow: {{ row.ring }}; color: {{ t.text }}; text-align: left; font-size: 13px">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ row.color }}"></span>
+              <span style="flex: 1">{{ row.label }}</span>
+              <span style="font-size: 12px; color: {{ row.hintFg }}">{{ row.hint }}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{ pk.hasNote }}" hint-placeholder-val="{{ false }}"><div style="padding: 8px 10px; font-size: 12px; color: {{ t.again }}">{{ pk.note }}</div></sc-if>
+          <div style="padding: 4px 10px 2px; font-size: 11px; color: {{ t.faint }}">↑ ↓ to choose · Enter to pick · Esc to clear</div>
+        </div>
+      </sc-if>
+      </div>
+    </sc-if>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <section aria-label="Media" style="flex: 3 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px">
+        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="4">
+          <button onClick="{{ tb.pick }}" aria-pressed="{{ tb.on }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 8px; background: {{ tb.bg }}; color: {{ tb.fg }}; border: 1px solid {{ tb.border }}; font-size: 13px; font-weight: 500">{{ tb.label }}<span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: {{ t.faint }}">{{ tb.count }}</span></button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ tabVideo }}" hint-placeholder-val="{{ true }}">
+        <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: {{ t.vid }}; border: 1px solid {{ t.vidLine }}; display: flex; align-items: center; justify-content: center">
+          <div style="position: absolute; left: 16px; top: 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{ t.vidText }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="14" height="14" rx="2"></rect><path d="M17 10l4-2v8l-4-2z"></path></svg>
+            YouTube · {{ cur.mediaVideo }}
+          </div>
+          <button onClick="{{ togglePlay }}" aria-label="{{ playLabel }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; padding: 0; width: 68px; height: 68px; border-radius: 50%; background: {{ accent }}; color: {{ t.onAccent }}; display: flex; align-items: center; justify-content: center">
+            <sc-if value="{{ notPlaying }}" hint-placeholder-val="{{ true }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4l13 8-13 8z"></path></svg></sc-if>
+            <sc-if value="{{ playing }}" hint-placeholder-val="{{ false }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg></sc-if>
+          </button>
+          <div style="position: absolute; right: 16px; bottom: 14px; font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.vidText }}">{{ speed }}% speed · loop {{ loopText }}</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+            <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">A {{ cur.loopA }}</span>
+            <div aria-hidden="true" style="flex: 1 1 200px; position: relative; height: 10px; border-radius: 5px; background: {{ t.line }}">
+              <div style="position: absolute; top: 0; bottom: 0; left: 28%; width: 22%; border-radius: 5px; background: {{ loopFill }}"></div>
+              <div style="position: absolute; top: -4px; bottom: -4px; left: 36%; width: 2px; border-radius: 1px; background: {{ t.text }}"></div>
+            </div>
+            <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">B {{ cur.loopB }}</span>
+            <button onClick="{{ toggleLoop }}" aria-pressed="{{ loop }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px solid {{ loopBorder }}; color: {{ loopFg }}; font-size: 13px">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"></path><path d="M3 12v-2a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 12v2a4 4 0 0 1-4 4H3"></path></svg>
+              Loop A–B
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+            <span style="font-size: 12px; color: {{ t.muted }}; margin-right: 6px">Speed</span>
+            <sc-for list="{{ speeds }}" as="sp" hint-placeholder-count="5">
+              <button onClick="{{ sp.pick }}" aria-pressed="{{ sp.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 10px; border-radius: 7px; background: {{ sp.bg }}; color: {{ sp.fg }}; font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px">{{ sp.label }}</button>
+            </sc-for>
+            <span style="flex: 1"></span>
+            <button onClick="{{ setA }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}; font-size: 12px">Set A here</button>
+            <button onClick="{{ setB }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}; font-size: 12px">Set B here</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabPdf }}" hint-placeholder-val="{{ false }}">
+        <div style="border-radius: 12px; background: {{ t.paper }}; color: {{ t.paperInk }}; padding: 28px 32px; display: flex; flex-direction: column; gap: 26px; min-height: 360px; box-sizing: border-box">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+            <span style="font-weight: 700; font-size: 16px">{{ cur.title }}</span>
+            <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.paperMuted }}">{{ cur.mediaPdf }}</span>
+          </div>
+          <sc-for list="{{ staves }}" as="st" hint-placeholder-count="3">
+            <div aria-hidden="true" style="display: flex; flex-direction: column; gap: 8px">
+              <div style="height: 1px; background: {{ t.paperLine }}"></div>
+              <div style="height: 1px; background: {{ t.paperLine }}"></div>
+              <div style="height: 1px; background: {{ t.paperLine }}"></div>
+              <div style="height: 1px; background: {{ t.paperLine }}"></div>
+              <div style="height: 1px; background: {{ t.paperLine }}"></div>
+              <div style="height: 1px; background: {{ t.paperLine }}"></div>
+            </div>
+          </sc-for>
+          <div style="font-size: 12px; color: {{ t.paperMuted }}">Your PDF page renders here. Zoom, turn pages, and it reopens where you left off.</div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px">
+          <button onClick="{{ pdfPrev }}" aria-label="Previous page" style="appearance: none; font: inherit; cursor: pointer; margin: 0; width: 36px; height: 36px; border-radius: 8px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}">‹</button>
+          <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: {{ t.muted }}">Page {{ pdfPage }} of {{ cur.pages }}</span>
+          <button onClick="{{ pdfNext }}" aria-label="Next page" style="appearance: none; font: inherit; cursor: pointer; margin: 0; width: 36px; height: 36px; border-radius: 8px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}">›</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabImages }}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px">
+          <sc-for list="{{ cur.imageList }}" as="im" hint-placeholder-count="2">
+            <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
+              <div style="aspect-ratio: 4 / 3; border-radius: 10px; background: {{ t.raised }}; border: 1px solid {{ t.line2 }}; display: flex; align-items: center; justify-content: center; color: {{ t.faint }}; overflow: hidden">
+                <sc-if value="{{ im.hasUrl }}" hint-placeholder-val="{{ false }}"><img src="{{ im.url }}" alt="{{ im.label }}" style="width: 100%; height: 100%; object-fit: cover"></sc-if>
+                <sc-if value="{{ im.noUrl }}" hint-placeholder-val="{{ true }}"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M21 17l-5-5-9 8"></path></svg></sc-if>
+              </div>
+              <figcaption style="font-size: 12px; color: {{ t.muted }}">{{ im.label }}</figcaption>
+            </figure>
+          </sc-for>
+          <button onClick="{{ pasteImage }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; aspect-ratio: 4 / 3; border-radius: 10px; background: transparent; border: 1.5px dashed {{ t.line5 }}; color: {{ t.muted }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 13px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+            Paste a screenshot
+            <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: 4px; border: 1px solid {{ t.line5 }}">⌘V</span>
+          </button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabTakes }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <button onClick="{{ toggleRec }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid {{ t.againLine }}; background: {{ t.againTint2 }}; color: {{ t.again }}; font-weight: 600">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: {{ t.again }}"></span>{{ recLabel }}
+          </button>
+          <sc-for list="{{ cur.takeList }}" as="tk" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 14px; border-radius: 10px; background: {{ t.surf }}; border: 1px solid {{ t.line }}">
+              <button onClick="{{ playTake }}" aria-label="{{ tk.aria }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; padding: 0; width: 36px; height: 36px; border-radius: 50%; background: {{ t.line }}; color: {{ t.text }}; display: flex; align-items: center; justify-content: center">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"></path></svg>
+              </button>
+              <span style="font-weight: 600; flex: 1 1 140px">{{ tk.label }}</span>
+              <sc-if value="{{ tk.isRef }}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: {{ t.easyTint }}; color: {{ t.easy }}">Reference</span></sc-if>
+              <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">{{ tk.date }} · {{ tk.len }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ cur.noTakes }}" hint-placeholder-val="{{ false }}">
+            <div style="color: {{ t.muted }}; font-size: 13px">No takes yet. Record one when it feels clean so you have something to compare against later.</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="min-height: 320px; border-radius: 12px; border: 1.5px dashed {{ t.line5 }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; color: {{ t.muted }}">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"></path></svg>
+          <div style="font-size: 15px; color: {{ t.text }}; font-weight: 600">{{ emptyTitle }}</div>
+          <div style="max-width: 380px">{{ emptyText }}</div>
+        </div>
+      </sc-if>
+    </section>
+
+    <aside aria-label="Item details" style="flex: 2 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="padding: 16px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+          <label for="item-notes" style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Notes</label>
+          <span style="font-size: 12px; color: {{ t.faint }}">{{ noteSaved }}</span>
+        </div>
+        <textarea id="item-notes" rows="8" placeholder="Anything goes: what to watch for, timestamps, lyrics, chord shapes, what your teacher said…" value="{{ cur.noteText }}" onChange="{{ setItemNote }}" style="width: 100%; min-height: 190px; padding: 12px 14px; border-radius: 10px; border: 1px solid {{ t.line2 }}; background: {{ t.surf2 }}; color: {{ t.text }}; font: inherit; font-size: 14px; line-height: 1.6; resize: vertical; box-sizing: border-box"></textarea>
+        <span style="font-size: 12px; color: {{ t.faint }}">Type <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; padding: 1px 5px; border-radius: 4px; border: 1px solid {{ t.line5 }}">/</span> to drop in an image, PDF, YouTube link or recording.</span>
+      </div>
+
+      <div style="padding: 16px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Progress</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; font-size: 13px">
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="color: {{ t.faint }}; font-size: 12px">Last practiced</span><span>{{ cur.last }}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="color: {{ t.faint }}; font-size: 12px">Stage · reviews</span><span>{{ cur.stage }} · {{ cur.reviews }}</span></div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <section aria-label="Rate this item" style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 16px; padding: 16px; border-radius: 14px; background: {{ t.surf }}; border: 1px solid {{ t.line2 }}">
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; flex: 1 1 480px">
+      <sc-for list="{{ ratings }}" as="r" hint-placeholder-count="4">
+        <button onClick="{{ r.rate }}" title="{{ r.tip }}" style="appearance: none; font: inherit; color: inherit; cursor: pointer; margin: 0; flex: 1 1 120px; min-height: 68px; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 10px 16px; border-radius: 12px; background: {{ t.raised }}; border: 1px solid {{ r.border }}; text-align: left; box-sizing: border-box">
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%">
+            <span style="font-size: 17px; font-weight: 700; color: {{ r.color }}">{{ r.label }}</span>
+            <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: 4px; border: 1px solid {{ t.line5 }}; color: {{ t.muted }}">{{ r.key }}</span>
+          </span>
+          <span style="font-size: 12px; color: {{ t.muted }}"><span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; color: {{ t.text }}">{{ r.ivl }}</span> · {{ r.hint }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; color: {{ t.faint }}">
+    <span>{{ keyHint }}</span>
+    <button onClick="{{ skip }}" style="appearance: none; border: 0; background: none; font: inherit; cursor: pointer; padding: 0; margin: 0; min-height: 32px; color: {{ t.muted }}; font-size: 13px; text-decoration: underline">Skip for now</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ---------- LIBRARY ---------- -->
+<sc-if value="{{ isLibrary }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 1120px; width: 100%">
+  <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em">Library</h1>
+      <div style="color: {{ t.muted }}">Everything you've captured, on every instrument.</div>
+    </div>
+    <button onClick="{{ openCapture }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      Capture
+    </button>
+  </header>
+  <div style="position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+    <label style="flex: 1 1 280px; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line2 }}; box-sizing: border-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ t.muted }}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <input aria-label="Search the library" placeholder="Search songs, riffs, scales…" value="{{ libQuery }}" onChange="{{ setLibQuery }}" style="flex: 1; min-width: 0; border: 0; outline-offset: 4px; background: transparent; color: {{ t.text }}; font: inherit">
+    </label>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}; flex-wrap: wrap">
+      <sc-for list="{{ libStatuses }}" as="ls" hint-placeholder-count="4">
+        <button onClick="{{ ls.pick }}" aria-pressed="{{ ls.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 7px; background: {{ ls.bg }}; color: {{ ls.fg }}; font-size: 13px; font-weight: 500">{{ ls.label }} <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: {{ t.faint }}">{{ ls.count }}</span></button>
+      </sc-for>
+    </div>
+    <div>
+      <button onClick="{{ toggleLibArea }}" aria-expanded="{{ libAreaOpen }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; background: {{ t.surf2 }}; border: 1px solid {{ t.line }}; color: {{ t.text }}; font-size: 13px"><span style="color: {{ t.faint }}">Area</span> {{ libAreaSel }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{ t.muted }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </button>
+      <sc-if value="{{ libAreaOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; top: 100%; margin-top: 6px; right: 0; z-index: 10; width: min(260px, 100%); max-height: 380px; overflow-y: auto; padding: 6px; border-radius: 12px; background: {{ t.surf2 }}; border: 1px solid {{ t.line4 }}; box-shadow: 0 16px 40px {{ t.shadow }}; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+          <sc-for list="{{ libAreaOpts }}" as="lo" hint-placeholder-count="8">
+            <button onClick="{{ lo.pick }}" aria-pressed="{{ lo.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 34px; padding: 0 10px; border-radius: 7px; background: {{ lo.bg }}; color: {{ lo.fg }}; text-align: left; font-size: 13px">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ lo.color }}"></span>
+              <span style="flex: 1">{{ lo.label }}</span>
+              <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: {{ lo.countFg }}">{{ lo.count }}</span>
+            </button>
+          </sc-for>
+          <div style="height: 1px; background: {{ t.line2 }}; margin: 4px 0"></div>
+          <button onClick="{{ manageAreas }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; width: 100%; min-height: 34px; padding: 0 10px; border-radius: 7px; background: transparent; color: {{ t.muted }}; text-align: left; font-size: 13px">Manage areas…</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="overflow-x: auto; border: 1px solid {{ t.line }}; border-radius: 12px">
+    <div style="min-width: 720px">
+      <div style="display: grid; grid-template-columns: minmax(240px, 2.4fr) 110px 150px 120px 130px; gap: 12px; padding: 12px 18px; font-size: 12px; color: {{ t.faint }}; font-weight: 600; background: {{ t.side }}">
+        <span>Name</span><span>Instrument</span><span>Area</span><span>Status</span><span>Next</span>
+      </div>
+      <sc-for list="{{ libRows }}" as="it" hint-placeholder-count="8">
+        <div style="display: grid; grid-template-columns: minmax(240px, 2.4fr) 110px 150px 120px 130px; gap: 12px; align-items: center; padding: 10px 18px; border-top: 1px solid {{ t.raised2 }}; font-size: 14px">
+          <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+            <button onClick="{{ it.open }}" style="appearance: none; border: 0; background: none; font: inherit; cursor: pointer; padding: 0; margin: 0; color: {{ t.text }}; font-weight: 600; text-align: left; min-height: 24px">{{ it.title }}</button>
+            <span style="font-size: 12px; color: {{ t.faint }}">{{ it.artistLine }}</span>
+          </span>
+          <span style="display: flex; align-items: center; gap: 8px; color: {{ t.muted }}"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ it.instColor }}"></span>{{ it.instName }}</span>
+          <span style="display: flex; align-items: center; gap: 8px; min-width: 0; color: {{ it.areaColFg }}"><span style="width: 6px; height: 6px; flex: none; border-radius: 50%; background: {{ it.areaColor }}"></span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.areaCol }}</span></span>
+          <span><span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: {{ it.stBg }}; color: {{ it.stFg }}; white-space: nowrap">{{ it.stLabel }}</span></span>
+          <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">{{ it.nextText }}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{ libEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 28px 18px; border-top: 1px solid {{ t.raised2 }}; color: {{ t.muted }}">Nothing matches. Try another filter, or capture it.</div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ---------- NOTES ---------- -->
+<sc-if value="{{ isNotes }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 1120px; width: 100%">
+  <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em">Notes</h1>
+      <div style="color: {{ t.muted }}">General practice notes, lesson notes, gear, resources.</div>
+    </div>
+    <button onClick="{{ newNote }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      New note
+    </button>
+  </header>
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <div style="flex: 1 1 240px; max-width: 100%; display: flex; flex-direction: column; gap: 6px">
+      <sc-for list="{{ noteList }}" as="nt" hint-placeholder-count="4">
+        <button onClick="{{ nt.pick }}" aria-pressed="{{ nt.on }}" style="appearance: none; font: inherit; color: inherit; cursor: pointer; margin: 0; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 10px; background: {{ nt.bg }}; border: 1px solid {{ nt.border }}; text-align: left; width: 100%; box-sizing: border-box">
+          <span style="font-weight: 600">{{ nt.title }}</span>
+          <span style="font-size: 12px; color: {{ t.faint }}">{{ nt.tag }} · {{ nt.edited }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <article style="flex: 3 1 480px; min-width: 0; padding: 24px 28px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 14px; border-bottom: 1px solid {{ t.line }}">
+        <span style="font-size: 12px; color: {{ t.faint }}; align-self: center; margin-right: 4px">Insert</span>
+        <sc-for list="{{ inserts }}" as="ins" hint-placeholder-count="6">
+          <button onClick="{{ ins.pick }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line4 }}; color: {{ t.text }}; font-size: 12px">{{ ins.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 style="margin: 0; font-size: 24px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em">{{ selNote.title }}</h2>
+        <span style="font-size: 12px; color: {{ t.faint }}">{{ selNote.tag }} · {{ selNote.edited }}</span>
+      </div>
+      <sc-for list="{{ selNote.paras }}" as="p" hint-placeholder-count="3"><p style="margin: 0; max-width: 64ch; color: {{ t.textSoft }}">{{ p.t }}</p></sc-for>
+      <sc-if value="{{ selNote.hasEmbed }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 10px; background: {{ t.raised }}; border: 1px solid {{ t.line3 }}; max-width: 460px">
+          <div style="width: 44px; height: 44px; border-radius: 8px; background: {{ t.sel2 }}; display: flex; align-items: center; justify-content: center; color: {{ t.muted }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 11px; color: {{ t.faint }}; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600">{{ selNote.embedKind }}</span>
+            <span style="font-weight: 600">{{ selNote.embedTitle }}</span>
+            <span style="font-size: 12px; color: {{ t.muted }}">{{ selNote.embedMeta }}</span>
+          </div>
+        </div>
+      </sc-if>
+    </article>
+  </div>
+</div>
+</sc-if>
+
+<!-- ---------- LOG ---------- -->
+<sc-if value="{{ isLog }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 22px; max-width: 1000px; width: 100%">
+  <header style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em">Practice log</h1>
+    <div style="color: {{ t.muted }}">Every session is saved automatically when you finish.</div>
+  </header>
+  <div style="display: flex; flex-wrap: wrap; gap: 12px">
+    <sc-for list="{{ logStats }}" as="st" hint-placeholder-count="4">
+      <div style="flex: 1 1 180px; padding: 16px 18px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; color: {{ t.faint }}">{{ st.label }}</span>
+        <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 24px; font-weight: 500">{{ st.value }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="padding: 18px 20px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px">
+      <h2 style="margin: 0; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Last 12 weeks</h2>
+      <span style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: {{ t.faint }}">Less
+        <span style="width: 12px; height: 12px; border-radius: 3px; background: {{ t.track }}"></span>
+        <span style="width: 12px; height: 12px; border-radius: 3px; background: {{ t.heat1 }}"></span>
+        <span style="width: 12px; height: 12px; border-radius: 3px; background: {{ t.heat2 }}"></span>
+        <span style="width: 12px; height: 12px; border-radius: 3px; background: {{ accent }}"></span>
+      More</span>
+    </div>
+    <div style="overflow-x: auto">
+      <div aria-label="Practice heatmap" style="display: grid; grid-template-rows: repeat(7, 16px); grid-auto-flow: column; grid-auto-columns: 16px; gap: 4px">
+        <sc-for list="{{ heat }}" as="h" hint-placeholder-count="84"><span style="border-radius: 3px; background: {{ h.bg }}"></span></sc-for>
+      </div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <h2 style="margin: 0 0 4px; font-size: 11px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: {{ t.faint }}; font-weight: 600">Sessions</h2>
+    <sc-for list="{{ logRows }}" as="lg" hint-placeholder-count="5">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding: 14px 18px; border-radius: 10px; background: {{ t.surf }}; border: 1px solid {{ t.line }}">
+        <div style="display: flex; flex-direction: column; gap: 2px; flex: 0 0 150px">
+          <span style="font-weight: 600">{{ lg.date }}</span>
+          <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">{{ lg.sub }}</span>
+        </div>
+        <div aria-hidden="true" style="flex: 0 1 200px; display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: {{ t.track }}">
+          <sc-for list="{{ lg.segs }}" as="sg" hint-placeholder-count="4"><span style="width: {{ sg.w }}; background: {{ sg.bg }}"></span></sc-for>
+        </div>
+        <span style="flex: 1 1 260px; color: {{ t.muted }}; font-size: 13px">{{ lg.noteText }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- ---------- SETTINGS ---------- -->
+<sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 860px; width: 100%">
+  <header style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em">Settings</h1>
+    <div style="color: {{ t.muted }}">Sensible defaults. Most people never touch these.</div>
+  </header>
+
+  <section style="padding: 20px 22px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700">Appearance</h2>
+        <span style="font-size: 13px; color: {{ t.muted }}">Pick a color scheme. System follows your computer's light or dark setting.</span>
+      </div>
+      <div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: {{ t.bg }}; border: 1px solid {{ t.line }}; flex-wrap: wrap">
+        <sc-for list="{{ modeBtns }}" as="mb" hint-placeholder-count="3">
+          <button onClick="{{ mb.pick }}" aria-pressed="{{ mb.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 7px; background: {{ mb.bg }}; color: {{ mb.fg }}; font-size: 13px; font-weight: 500">{{ mb.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr)); gap: 12px">
+      <sc-for list="{{ paletteCards }}" as="pc" hint-placeholder-count="4">
+        <button onClick="{{ pc.pick }}" aria-pressed="{{ pc.on }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: {{ pc.bg }}; border: 2px solid {{ pc.ring }}; text-align: left; box-sizing: border-box">
+          <span aria-hidden="true" style="display: flex; height: 34px; border-radius: 8px; overflow: hidden; border: 1px solid {{ pc.line }}">
+            <sc-for list="{{ pc.sw }}" as="sw" hint-placeholder-count="6"><span style="flex: 1; background: {{ sw.c }}"></span></sc-for>
+          </span>
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 700; color: {{ pc.text }}">{{ pc.name }}<span style="font-size: 11px; font-weight: 600; color: {{ pc.accent }}">{{ pc.badge }}</span></span>
+          <span style="font-size: 12px; color: {{ pc.muted }}">{{ pc.blurb }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding: 20px 22px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 18px">
+    <h2 style="margin: 0; font-size: 17px; font-weight: 700">Scheduling</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Rating buttons</span><span style="font-size: 13px; color: {{ t.muted }}">Four buttons, like Anki, or the simple two-button flow. Same scheduler underneath.</span></div>
+      <div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: {{ t.bg }}; border: 1px solid {{ t.line }}; flex-wrap: wrap">
+        <button onClick="{{ setFour }}" aria-pressed="{{ isFour }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 7px; background: {{ fourBg }}; color: {{ fourFg }}; font-size: 13px; font-weight: 500">Again · Hard · Good · Easy</button>
+        <button onClick="{{ setSimple }}" aria-pressed="{{ simple }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 7px; background: {{ simpleBg }}; color: {{ simpleFg }}; font-size: 13px; font-weight: 500">Simple: Again · Good</button>
+      </div>
+    </div>
+    <sc-for list="{{ steppers }}" as="sv" hint-placeholder-count="3">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-top: 16px; border-top: 1px solid {{ t.track }}">
+        <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{ sv.label }}</span><span style="font-size: 13px; color: {{ t.muted }}">{{ sv.desc }}</span></div>
+        <div style="display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: {{ t.bg }}; border: 1px solid {{ t.line }}">
+          <button onClick="{{ sv.dec }}" aria-label="{{ sv.decLabel }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; width: 36px; height: 36px; border-radius: 7px; background: {{ t.raised2 }}; color: {{ t.text }}; font-size: 16px">−</button>
+          <span style="min-width: 84px; text-align: center; font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 14px">{{ sv.value }}</span>
+          <button onClick="{{ sv.inc }}" aria-label="{{ sv.incLabel }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; width: 36px; height: 36px; border-radius: 7px; background: {{ t.raised2 }}; color: {{ t.text }}; font-size: 16px">+</button>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+
+  <section style="padding: 20px 22px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-size: 17px; font-weight: 700">Instruments</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{ settingsInst }}" as="si" hint-placeholder-count="5">
+        <span style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: {{ t.raised2 }}; border: 1px solid {{ t.line3 }}"><span style="width: 9px; height: 9px; border-radius: 3px; background: {{ si.color }}"></span>{{ si.name }}<span style="font-size: 12px; color: {{ t.muted }}">{{ si.count }}</span></span>
+      </sc-for>
+      <sc-if value="{{ instAddSet }}" hint-placeholder-val="{{ false }}">
+        <input ref="{{ instRef }}" aria-label="New instrument name" maxlength="24" placeholder="Instrument name, then Enter" value="{{ instDraftText }}" onChange="{{ setInstDraft }}" onKeyDown="{{ instDraftKey }}" onBlur="{{ instDraftBlur }}" style="min-height: 36px; width: 210px; padding: 0 14px; border-radius: 999px; border: 1px solid {{ accent }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 13px; box-sizing: border-box">
+      </sc-if>
+      <sc-if value="{{ instAddSetBtn }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ startInstSet }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: transparent; border: 1px dashed {{ t.line5 }}; color: {{ t.muted }}; font-size: 13px">+ Add instrument</button>
+      </sc-if>
+    </div>
+  </section>
+
+  <section style="padding: 20px 22px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700">Areas</h2>
+      <span style="font-size: 13px; color: {{ t.muted }}">Optional labels for your items. Today doesn't use them, so rename, recolor or delete freely. Click a name to rename it. Renaming onto an existing area merges the two.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 2px 18px">
+      <sc-for list="{{ areaRows }}" as="ar" hint-placeholder-count="20">
+        <div style="display: flex; flex-direction: column">
+          <div style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 2px 6px; border-radius: 8px; background: {{ ar.bg }}">
+            <button onClick="{{ ar.swatch }}" aria-label="{{ ar.swatchLabel }}" title="Change color" style="appearance: none; font: inherit; cursor: pointer; margin: 0; padding: 0; width: 30px; height: 30px; flex: none; border-radius: 8px; background: transparent; border: 1px solid {{ t.line3 }}; display: flex; align-items: center; justify-content: center"><span style="width: 12px; height: 12px; border-radius: 50%; background: {{ ar.color }}"></span></button>
+            <sc-if value="{{ ar.editing }}" hint-placeholder-val="{{ false }}">
+              <input ref="{{ editRef }}" aria-label="Rename area" maxlength="32" value="{{ ar.editText }}" onChange="{{ ar.setEdit }}" onKeyDown="{{ ar.editKey }}" onBlur="{{ ar.commit }}" style="flex: 1; min-width: 0; min-height: 32px; padding: 0 10px; border-radius: 7px; border: 1px solid {{ accent }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 14px; box-sizing: border-box">
+            </sc-if>
+            <sc-if value="{{ ar.notEditing }}" hint-placeholder-val="{{ true }}">
+              <button ref="{{ renamedRef }}" data-area="{{ ar.id }}" onClick="{{ ar.startEdit }}" aria-label="{{ ar.renameLabel }}" title="Rename" style="appearance: none; border: 0; background: none; color: {{ t.text }}; font: inherit; cursor: text; margin: 0; padding: 0 4px; flex: 1; min-width: 0; min-height: 32px; text-align: left; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ ar.name }}</button>
+            </sc-if>
+            <button onClick="{{ ar.openLib }}" title="Show in Library" style="appearance: none; border: 0; background: none; font: inherit; cursor: pointer; margin: 0; padding: 0 4px; min-height: 32px; color: {{ t.muted }}; font-size: 12px; text-decoration: underline; white-space: nowrap">{{ ar.countText }}</button>
+            <button onClick="{{ ar.del }}" aria-label="{{ ar.delLabel }}" title="Delete" style="appearance: none; border: 0; background: none; font: inherit; cursor: pointer; margin: 0; padding: 0; width: 32px; height: 32px; flex: none; border-radius: 7px; color: {{ t.faint }}; display: flex; align-items: center; justify-content: center">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>
+            </button>
+          </div>
+          <sc-if value="{{ ar.hasErr }}" hint-placeholder-val="{{ false }}"><div style="padding: 0 8px 6px 44px; font-size: 12px; color: {{ t.again }}">{{ ar.err }}</div></sc-if>
+          <sc-if value="{{ ar.isMergeAsk }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 6px 40px; padding: 8px 10px; border-radius: 8px; background: {{ t.accentTint }}; font-size: 13px">
+              <span style="flex: 1 1 180px">{{ ar.mergeText }}</span>
+              <button ref="{{ mergeRef }}" onClick="{{ ar.mergeYes }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 12px; border-radius: 7px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600; font-size: 12px">Merge</button>
+              <button onClick="{{ ar.mergeNo }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-size: 12px">Cancel</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid {{ t.track }}">
+      <input aria-label="New area name" maxlength="32" placeholder="+ Add area" value="{{ newAreaText }}" onChange="{{ setNewArea }}" onKeyDown="{{ newAreaKey }}" style="flex: 0 1 260px; min-width: 0; min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px dashed {{ t.line6 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 14px; box-sizing: border-box">
+      <button onClick="{{ addAreaBtn }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 40px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600; font-size: 13px">Add</button>
+      <span style="font-size: 12px; color: {{ t.faint }}">{{ areaCountLine }}</span>
+    </div>
+  </section>
+
+  <section style="padding: 20px 22px; border-radius: 12px; background: {{ t.surf }}; border: 1px solid {{ t.line }}; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700">Your data</h2>
+      <span style="font-size: 13px; color: {{ t.muted }}">Everything lives on this Mac, inside Sustain's own app container. No account, no server. That makes backups your job, so they're one click.</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px">
+      <button onClick="{{ exportBackup }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 16px; border-radius: 10px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600">Export backup (.sustain)</button>
+      <button onClick="{{ importBackup }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600">Import backup</button>
+      <button onClick="{{ importNotion }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600">Import from Notion (CSV)</button>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-top: 16px; border-top: 1px solid {{ t.track }}">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Daily backup to a folder</span><span style="font-size: 13px; color: {{ t.muted }}">Pick a folder (Dropbox, iCloud Drive, a USB stick) and Sustain saves a copy there every day.</span></div>
+      <button onClick="{{ toggleAuto }}" aria-pressed="{{ autoBackup }}" aria-label="Daily backup to a folder" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; padding: 0; position: relative; width: 48px; height: 28px; border-radius: 14px; background: {{ autoBg }}">
+        <span style="position: absolute; top: 4px; left: {{ autoKnob }}; width: 20px; height: 20px; border-radius: 50%; background: {{ t.text }}"></span>
+      </button>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-top: 16px; border-top: 1px solid {{ t.track }}">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Sync with iCloud <span style="margin-left: 6px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: {{ t.sel2 }}; color: {{ t.muted }}">Later</span></span><span style="font-size: 13px; color: {{ t.muted }}">Keep your other Macs (and later an iPad) in step through your own iCloud account. Still no Sustain account or server. Comes after the first version.</span></div>
+      <button disabled="{{ true }}" aria-label="Sync with iCloud (coming later)" style="appearance: none; border: 0; font: inherit; margin: 0; padding: 0; position: relative; width: 48px; height: 28px; border-radius: 14px; background: {{ t.line5 }}; opacity: 0.5; cursor: not-allowed">
+        <span style="position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: {{ t.text }}"></span>
+      </button>
+    </div>
+    <div style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: {{ t.muted }}">Stored on this Mac · last backup {{ lastBackup }}</div>
+  </section>
+</div>
+</sc-if>
+
+</main>
+
+<!-- ============ CAPTURE MODAL ============ -->
+<sc-if value="{{ showCapture }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 20; background: {{ t.overlay }}; display: flex; justify-content: center; align-items: flex-start; padding: 64px 16px 16px; box-sizing: border-box; overflow-y: auto">
+  <div role="dialog" aria-modal="true" aria-labelledby="cap-title" tabindex="-1" onKeyDown="{{ capKey }}" style="width: 100%; max-width: 620px; background: {{ t.surf2 }}; border: 1px solid {{ t.line3 }}; border-radius: 16px; padding: 22px 24px 20px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box; box-shadow: 0 24px 64px {{ t.shadow }}">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <h2 id="cap-title" style="margin: 0; font-size: 20px; font-weight: 700">Capture</h2>
+        <span style="font-size: 13px; color: {{ t.muted }}">Name it now. Fill in the rest whenever.</span>
+      </div>
+      <button onClick="{{ closeCapture }}" aria-label="Close" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; padding: 0; width: 36px; height: 36px; border-radius: 8px; background: {{ t.raised2 }}; color: {{ t.muted }}; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="cap-name" style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Name</label>
+      <input id="cap-name" ref="{{ nameRef }}" placeholder="Song, riff, scale, exercise…" value="{{ form.name }}" onChange="{{ setName }}" style="min-height: 46px; padding: 0 14px; border-radius: 10px; border: 1px solid {{ t.line5 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 16px; box-sizing: border-box; width: 100%">
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Instrument</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px">
+        <sc-for list="{{ capInsts }}" as="ci" hint-placeholder-count="5">
+          <button onClick="{{ ci.pick }}" onMouseDown="{{ keepFocus }}" aria-pressed="{{ ci.on }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: {{ ci.bg }}; border: 1px solid {{ ci.border }}; color: {{ ci.fg }}; font-size: 13px"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ ci.color }}"></span>{{ ci.name }}</button>
+        </sc-for>
+        <sc-if value="{{ instAddCap }}" hint-placeholder-val="{{ false }}">
+          <input ref="{{ instRef }}" aria-label="New instrument name" maxlength="24" placeholder="Instrument name, then Enter" value="{{ instDraftText }}" onChange="{{ setInstDraft }}" onKeyDown="{{ instDraftKey }}" onBlur="{{ instDraftBlur }}" style="min-height: 36px; width: 210px; padding: 0 14px; border-radius: 999px; border: 1px solid {{ accent }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 13px; box-sizing: border-box">
+        </sc-if>
+        <sc-if value="{{ instAddCapBtn }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ startInstCap }}" onMouseDown="{{ keepFocus }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: transparent; border: 1px dashed {{ t.line5 }}; color: {{ t.muted }}; font-size: 13px">+ Instrument</button>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Area <span style="font-weight: 400; color: {{ t.faint }}">· optional</span></span>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+        <sc-for list="{{ pk.chips }}" as="ac" hint-placeholder-count="6">
+          <button onClick="{{ ac.pick }}" onMouseDown="{{ keepFocus }}" aria-pressed="{{ ac.on }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 12px; border-radius: 999px; background: {{ ac.bg }}; border: 1px {{ ac.borderStyle }} {{ ac.border }}; color: {{ ac.fg }}; font-size: 12px; font-weight: 500"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{ ac.color }}"></span>{{ ac.label }}</button>
+        </sc-for>
+        <input aria-label="Type an area" maxlength="32" placeholder="+ Type an area…" value="{{ pk.text }}" onChange="{{ pk.setText }}" onKeyDown="{{ pk.onKey }}" role="combobox" aria-autocomplete="list" aria-expanded="{{ pk.open }}" aria-controls="{{ pk.listId }}" aria-activedescendant="{{ pk.activeId }}" style="flex: 1 1 160px; min-width: 140px; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px dashed {{ t.line6 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 12px; box-sizing: border-box">
+      </div>
+      <sc-if value="{{ pk.open }}" hint-placeholder-val="{{ false }}">
+        <div id="{{ pk.listId }}" role="listbox" aria-label="Area suggestions" style="display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 10px; background: {{ t.bg }}; border: 1px solid {{ t.line4 }}">
+          <sc-for list="{{ pk.rows }}" as="row" hint-placeholder-count="3">
+            <button id="{{ row.id }}" role="option" aria-selected="{{ row.on }}" tabindex="-1" onClick="{{ row.pick }}" onMouseDown="{{ keepFocus }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 0 10px; border-radius: 7px; background: {{ row.bg }}; box-shadow: {{ row.ring }}; color: {{ t.text }}; text-align: left; font-size: 13px">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ row.color }}"></span>
+              <span style="flex: 1">{{ row.label }}</span>
+              <span style="font-size: 12px; color: {{ row.hintFg }}">{{ row.hint }}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{ pk.hasNote }}" hint-placeholder-val="{{ false }}"><div style="padding: 8px 10px; font-size: 12px; color: {{ t.again }}">{{ pk.note }}</div></sc-if>
+          <div style="padding: 4px 10px 2px; font-size: 11px; color: {{ t.faint }}">↑ ↓ to choose · Enter to pick · Esc to clear</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Schedule</span>
+        <div style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: {{ t.bg }}; border: 1px solid {{ t.line4 }}">
+          <sc-for list="{{ capLanes }}" as="ln" hint-placeholder-count="3">
+            <button onClick="{{ ln.pick }}" onMouseDown="{{ keepFocus }}" aria-pressed="{{ ln.on }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 14px; border-radius: 7px; background: {{ ln.bg }}; color: {{ ln.fg }}; font-size: 13px; font-weight: 600">{{ ln.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <span style="flex: 1 1 180px; padding-bottom: 10px; font-size: 12px; color: {{ t.faint }}">{{ laneHint }}</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="cap-notes" style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Notes &amp; media <span style="font-weight: 400; color: {{ t.faint }}">· optional</span></label>
+      <div onDragOver="{{ capDragOver }}" onDrop="{{ capDrop }}" style="display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 12px; border: 1.5px dashed {{ t.line5 }}; background: {{ t.dim }}">
+        <textarea id="cap-notes" rows="4" placeholder="Write anything. Paste screenshots right here (⌘V), drop PDFs, images or audio, add as many as you like." value="{{ form.noteText }}" onChange="{{ setCapNote }}" onPaste="{{ capPaste }}" style="width: 100%; min-height: 96px; padding: 10px 12px; border-radius: 8px; border: 1px solid {{ t.line3 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 14px; line-height: 1.55; resize: vertical; box-sizing: border-box"></textarea>
+        <sc-if value="{{ capHasAtt }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{ capAtts }}" as="at" hint-placeholder-count="2">
+              <figure style="position: relative; margin: 0; width: 112px; display: flex; flex-direction: column; gap: 4px">
+                <div style="height: 76px; border-radius: 8px; overflow: hidden; background: {{ t.raised }}; border: 1px solid {{ t.line3 }}; display: flex; align-items: center; justify-content: center; color: {{ t.faint }}">
+                  <sc-if value="{{ at.hasUrl }}" hint-placeholder-val="{{ false }}"><img src="{{ at.url }}" alt="{{ at.name }}" style="width: 100%; height: 100%; object-fit: cover"></sc-if>
+                  <sc-if value="{{ at.noUrl }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: {{ t.muted }}">{{ at.kindLabel }}</span></sc-if>
+                </div>
+                <figcaption style="font-size: 11px; color: {{ t.muted }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ at.name }}</figcaption>
+                <button onClick="{{ at.remove }}" aria-label="{{ at.removeLabel }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; padding: 0; position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: {{ t.overlay }}; color: #FFFFFF; font-size: 13px; line-height: 22px">×</button>
+              </figure>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ t.muted }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg>
+          <input id="cap-link" aria-label="Link" placeholder="Paste a YouTube link or any URL" value="{{ form.link }}" onChange="{{ setLink }}" style="flex: 1 1 200px; min-width: 0; min-height: 36px; padding: 0 10px; border-radius: 8px; border: 1px solid {{ t.line3 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 13px; box-sizing: border-box">
+          <button onClick="{{ addMockShot }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-size: 12px">+ Screenshot</button>
+          <button onClick="{{ addMockFile }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 36px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-size: 12px">+ File</button>
+        </div>
+        <sc-if value="{{ hasDetect }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: {{ t.easyTint }}; color: {{ t.easy }}; font-size: 13px; font-weight: 500">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>
+            {{ detectText }}
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 4px">
+      <span style="font-size: 12px; color: {{ t.faint }}">{{ capFooter }} · <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; padding: 2px 5px; border-radius: 4px; border: 1px solid {{ t.line5 }}">⇧↩</span> adds another</span>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button onClick="{{ addPractice }}" disabled="{{ capDisabled }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600; opacity: {{ capOpacity }}">Add &amp; practice</button>
+        <button onClick="{{ addOnly }}" disabled="{{ capDisabled }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px; border-radius: 10px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600; opacity: {{ capOpacity }}">Add <span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: 4px; border: 1px solid {{ t.onAccentLine }}">↩</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ SESSION COMPLETE ============ -->
+<sc-if value="{{ showSummary }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 20; background: {{ t.overlay }}; display: flex; justify-content: center; align-items: flex-start; padding: 64px 16px 16px; box-sizing: border-box; overflow-y: auto">
+  <div role="dialog" aria-modal="true" aria-labelledby="sum-title" style="width: 100%; max-width: 580px; background: {{ t.surf2 }}; border: 1px solid {{ t.line3 }}; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box; box-shadow: 0 24px 64px {{ t.shadow }}">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 36px; height: 36px; border-radius: 50%; background: {{ accent }}; color: {{ t.onAccent }}; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>
+      </span>
+      <h2 id="sum-title" style="margin: 0; font-size: 22px; font-weight: 700">Session complete</h2>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px">
+      <div style="flex: 1 1 120px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: {{ t.faint }}">Time</span><span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 24px">{{ sumMin }}</span></div>
+      <div style="flex: 1 1 120px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: {{ t.faint }}">Reviewed</span><span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 24px">{{ sumItems }}</span></div>
+      <div style="flex: 1 1 120px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: {{ t.faint }}">Streak</span><span style="font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 24px; color: {{ accent }}">{{ streak }} days</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div aria-hidden="true" style="display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: {{ t.track }}">
+        <sc-for list="{{ mixSegs }}" as="sg" hint-placeholder-count="4"><span style="width: {{ sg.w }}; background: {{ sg.bg }}"></span></sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px">
+        <sc-for list="{{ mixLegend }}" as="ml" hint-placeholder-count="4"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ ml.color }}"></span>{{ ml.text }}</span></sc-for>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; color: {{ t.faint }}">Last 12 weeks</span>
+      <div style="overflow-x: auto">
+        <div aria-hidden="true" style="display: grid; grid-template-rows: repeat(7, 11px); grid-auto-flow: column; grid-auto-columns: 11px; gap: 3px">
+          <sc-for list="{{ heat }}" as="h" hint-placeholder-count="84"><span style="border-radius: 2px; background: {{ h.bg }}"></span></sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="sum-note" style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Session note</label>
+      <textarea id="sum-note" rows="3" placeholder="What felt off? What clicked?" value="{{ note }}" onChange="{{ setNote }}" style="padding: 10px 12px; border-radius: 10px; border: 1px solid {{ t.line5 }}; background: {{ t.bg }}; color: {{ t.text }}; font: inherit; font-size: 14px; resize: vertical; box-sizing: border-box; width: 100%"></textarea>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap">
+      <button onClick="{{ closeSummary }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600">Back to Today</button>
+      <button onClick="{{ saveSession }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 18px; border-radius: 10px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600">Save to log</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ NOTION IMPORT PREVIEW (M3) ============ -->
+<sc-if value="{{ showNotion }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 20; background: {{ t.overlay }}; display: flex; justify-content: center; align-items: flex-start; padding: 64px 16px 16px; box-sizing: border-box; overflow-y: auto">
+  <div role="dialog" aria-modal="true" aria-labelledby="notion-title" onKeyDown="{{ notionKey }}" style="width: 100%; max-width: 600px; background: {{ t.surf2 }}; border: 1px solid {{ t.line3 }}; border-radius: 16px; padding: 22px 24px 20px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box; box-shadow: 0 24px 64px {{ t.shadow }}">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <h2 id="notion-title" style="margin: 0; font-size: 20px; font-weight: 700">Import from Notion</h2>
+        <span style="font-size: 13px; color: {{ t.muted }}">Guitar Knowledge export (CSV). Here's how your Notion Area values land.</span>
+      </div>
+      <button onClick="{{ closeNotion }}" aria-label="Close" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; padding: 0; width: 36px; height: 36px; border-radius: 8px; background: {{ t.raised2 }}; color: {{ t.muted }}; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 12px; color: {{ t.muted }}; font-weight: 600">Instrument for this file</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px">
+        <sc-for list="{{ notionInsts }}" as="ni" hint-placeholder-count="5">
+          <button onClick="{{ ni.pick }}" aria-pressed="{{ ni.on }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 12px; border-radius: 999px; background: {{ ni.bg }}; border: 1px solid {{ ni.border }}; color: {{ ni.fg }}; font-size: 13px"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{ ni.color }}"></span>{{ ni.name }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="border: 1px solid {{ t.line }}; border-radius: 10px; overflow: hidden">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 12px; padding: 10px 14px; background: {{ t.side }}; font-size: 12px; color: {{ t.faint }}; font-weight: 600"><span>Notion Area</span><span>Becomes</span></div>
+      <sc-for list="{{ notionRows }}" as="nr" hint-placeholder-count="11">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 12px; align-items: center; padding: 8px 14px; border-top: 1px solid {{ t.raised2 }}; font-size: 13px">
+          <span style="color: {{ t.muted }}">{{ nr.from }}</span>
+          <span style="display: flex; align-items: center; gap: 8px; min-width: 0"><span style="width: 8px; height: 8px; flex: none; border-radius: 50%; background: {{ nr.color }}"></span><span style="font-weight: 600">{{ nr.to }}</span><span style="font-size: 12px; color: {{ t.faint }}">{{ nr.how }}</span></span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size: 12px; color: {{ t.muted }}">{{ notionSummary }}. FOCUS becomes the Focus setting. Interval and Last Practiced seed the schedule.</div>
+    <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap">
+      <button onClick="{{ closeNotion }}" style="appearance: none; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 16px; border-radius: 10px; background: transparent; border: 1px solid {{ t.line5 }}; color: {{ t.text }}; font-weight: 600">Cancel</button>
+      <button onClick="{{ runNotion }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 44px; padding: 0 18px; border-radius: 10px; background: {{ accent }}; color: {{ t.onAccent }}; font-weight: 600">Import</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<div style="position: sticky; bottom: 0; width: 100%; height: 0; z-index: 30">
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" onMouseEnter="{{ toastHold }}" onMouseLeave="{{ toastResume }}" style="position: absolute; right: 24px; bottom: 24px; max-width: 440px; display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 16px; border-radius: 10px; background: {{ t.text }}; color: {{ t.bg }}; font-weight: 600; font-size: 13px; box-shadow: 0 12px 32px {{ t.shadow }}">
+    <span style="flex: 1">{{ toast }}</span>
+    <sc-if value="{{ toastUndo }}" hint-placeholder-val="{{ false }}">
+      <button ref="{{ undoRef }}" onClick="{{ undoArea }}" onFocus="{{ toastHold }}" onBlur="{{ toastResume }}" style="appearance: none; border: 0; font: inherit; cursor: pointer; margin: 0; min-height: 32px; padding: 0 14px; border-radius: 7px; background: {{ t.bg }}; color: {{ t.text }}; font-weight: 700">Undo</button>
+    </sc-if>
+  </div>
+</sc-if>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["today","practice","capture","capture-new","library","session","log","notes","settings"],"default":"today","section":"Prototype"},"palette":{"editor":"enum","options":["paper","studio","console","circuit"],"default":"paper","section":"Color scheme"},"mode":{"editor":"enum","options":["system","dark","light"],"default":"system","section":"Color scheme"},"simple":{"editor":"boolean","default":false,"section":"Prototype"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var self = this;
+    this.taps = [];
+    // Stable callback refs: focus an input once when it mounts, never on re-render.
+    this.nameRef = function (el) { if (el && el !== self._nameEl) { self._nameEl = el; el.focus(); } };
+    this.pickRef = function (el) { if (el && el !== self._pickEl) { self._pickEl = el; el.focus(); } };
+    this.editRef = function (el) { if (el && el !== self._editEl) { self._editEl = el; el.focus(); el.select(); } };
+    this.undoRef = function (el) { if (el && el !== self._undoEl) { self._undoEl = el; el.focus(); } };
+    this.mergeRef = function (el) { if (el && el !== self._mergeEl) { self._mergeEl = el; el.focus(); } };
+    this.areaBtnRef = function (el) { self._areaBtnEl = el; };
+    this.instRef = function (el) { if (el && el !== self._instEl) { self._instEl = el; el.focus(); } };
+    this.renamedRef = function (el) { if (el && self._refocusArea && el.getAttribute('data-area') === self._refocusArea) { self._refocusArea = null; el.focus(); } };
+    this.toastMs = 2800;
+    this.sysDark = true;
+    try { if (typeof window !== 'undefined' && window.matchMedia) this.sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { this.sysDark = true; }
+    this.state = this.initState(props.start || 'today');
+  }
+
+  defaultInstruments() {
+    return {
+      guitar: { name: 'Guitar', color: 'amber' },
+      bass: { name: 'Bass', color: 'violet' },
+      piano: { name: 'Piano', color: 'blue' },
+      drums: { name: 'Drums', color: 'coral' },
+      voice: { name: 'Voice', color: 'teal' }
+    };
+  }
+
+  // Instruments live in state so people can add their own. Always hand out copies.
+  instMeta() {
+    var src = (this.state && this.state.instruments) || this.defaultInstruments();
+    var out = {};
+    Object.keys(src).forEach(function (k) { out[k] = { name: src[k].name, color: src[k].color }; });
+    return out;
+  }
+
+  commitInstDraft() {
+    var self = this;
+    var s = this.state;
+    var d = s.instDraft;
+    if (!d) return;
+    var name = this.cleanName(d.text).slice(0, 24);
+    if (!name || !this.nameKey(name)) { this.setState({ instDraft: null }); return; }
+    var ins = s.instruments;
+    var key = this.nameKey(name);
+    var existing = Object.keys(ins).find(function (k) { return self.nameKey(ins[k].name) === key; });
+    var id = existing;
+    var next = ins;
+    if (!existing) {
+      id = 'in_' + key.replace(/[^a-z0-9#]+/g, '-');
+      if (ins[id]) id = id + '-' + Date.now().toString(36);
+      var pal = this.palette();
+      var used = Object.keys(ins).map(function (k) { return ins[k].color; });
+      var counts = pal.map(function (c) { return used.filter(function (u) { return u === c; }).length; });
+      next = Object.assign({}, ins);
+      next[id] = { name: name, color: pal[counts.indexOf(Math.min.apply(null, counts))] };
+    }
+    var patch = { instruments: next, instDraft: null };
+    if (d.where === 'capture') {
+      patch.form = Object.assign({}, s.form, { inst: id });
+      patch.capChips = this.rankAreas(id, s.form.areaId);
+    }
+    this.setState(patch);
+    this.flash(existing ? '"' + ins[existing].name + '" is already on your list' : 'Added ' + name + '. Areas work across every instrument.');
+  }
+
+  // ---------- Capture: freeform notes + any number of attachments ----------
+  addFiles(files) {
+    var atts = this.state.form.attachments.slice();
+    files.forEach(function (f, i) {
+      var type = f.type || '';
+      var isImg = /^image\//.test(type);
+      var url = '';
+      try { if (isImg && typeof URL !== 'undefined' && URL.createObjectURL) url = URL.createObjectURL(f); } catch (e) { url = ''; }
+      atts.push({ id: 'at' + Date.now() + '-' + i + '-' + atts.length, kind: isImg ? 'image' : /pdf/.test(type) ? 'pdf' : /^audio\//.test(type) ? 'audio' : 'file', name: f.name || (isImg ? 'Screenshot ' + (atts.length + 1) : 'File'), url: url });
+    });
+    this.setForm({ attachments: atts });
+  }
+  capPaste(e) {
+    var cd = e.clipboardData;
+    var files = [];
+    if (cd && cd.items) for (var i = 0; i < cd.items.length; i++) { var it = cd.items[i]; if (it.kind === 'file') { var f = it.getAsFile(); if (f) files.push(f); } }
+    if (!files.length) return;
+    e.preventDefault();
+    this.addFiles(files);
+  }
+  capDrop(e) {
+    e.preventDefault();
+    var fl = e.dataTransfer && e.dataTransfer.files;
+    if (fl && fl.length) this.addFiles(Array.prototype.slice.call(fl));
+  }
+  addMockAttachment(kind) {
+    var atts = this.state.form.attachments.slice();
+    var n = atts.filter(function (a) { return a.kind === kind; }).length + 1;
+    atts.push({ id: 'at' + Date.now() + '-' + atts.length, kind: kind, name: kind === 'image' ? 'Screenshot ' + n : 'Tab-' + n + '.pdf', url: '' });
+    this.setForm({ attachments: atts });
+  }
+  removeAttachment(id) { this.setForm({ attachments: this.state.form.attachments.filter(function (a) { return a.id !== id; }) }); }
+
+  // ---------- Areas: one global, optional, user-editable list ----------
+  palette() { return ['amber', 'coral', 'rose', 'violet', 'blue', 'teal', 'green', 'slate']; }
+
+  seedAreas() {
+    var self = this;
+    var pal = this.palette();
+    var names = ['Repertoire', 'Technique', 'Ear Training', 'Transcription', 'Songwriting', 'Scales', 'Chords', 'Licks', 'Fretboard', 'Jam', 'Grooves', 'Walking Lines', 'Voicings', 'Sight-Reading', 'Rudiments', 'Fills', 'Independence', 'Lyrics', 'Range & Breath'];
+    var rows = names.map(function (n, i) {
+      var slug = self.nameKey(n).replace(/ /g, '-');
+      return { id: 'seed-' + slug, seedKey: slug, name: n, nameKey: self.nameKey(n), color: pal[i % pal.length], createdAt: i };
+    });
+    rows.push({ id: 'ar_gigset', name: 'Gig set', nameKey: this.nameKey('Gig set'), color: this.leastUsedColor(rows), createdAt: 1000 });
+    return rows;
+  }
+
+  // Day-one chip order per instrument. After that, usage outranks this.
+  seedSuggest() {
+    return {
+      guitar: ['repertoire', 'chord', 'scale', 'lick', 'technique', 'ear-training'],
+      bass: ['repertoire', 'groove', 'scale', 'walking-line', 'technique', 'ear-training'],
+      piano: ['repertoire', 'voicing', 'scale', 'sight-reading', 'technique', 'ear-training'],
+      drums: ['repertoire', 'rudiment', 'groove', 'fill', 'independence', 'technique'],
+      voice: ['repertoire', 'range-breath', 'lyric', 'technique', 'ear-training', 'songwriting'],
+      other: ['repertoire', 'technique', 'ear-training', 'transcription', 'songwriting']
+    };
+  }
+
+  // Case, punctuation and a trailing plural "s" fold together; musical symbols do not.
+  nameKey(name) {
+    var k = String(name || '').normalize('NFKC').toLowerCase().replace(/♯/g, '#').replace(/♭/g, 'b');
+    k = k.replace(/[\s\-–—_\/&.,:;'"()!?]+/g, ' ').trim();
+    if (!k) return '';
+    var parts = k.split(' ');
+    var last = parts[parts.length - 1];
+    if (last.length >= 3 && /s$/.test(last) && !/ss$/.test(last)) parts[parts.length - 1] = last.slice(0, -1);
+    return parts.join(' ');
+  }
+
+  cleanName(name) { return String(name || '').replace(/\s+/g, ' ').trim().slice(0, 32); }
+  isWarmKey(key) { return /\bwarm ?up\b/.test(key); }
+  isReservedKey(key) { return key === 'no area' || key === 'all area'; }
+  areaById(id, areas) { if (!id) return null; return (areas || this.state.areas).find(function (a) { return a.id === id; }) || null; }
+  blankPk() { return { text: '', hi: -1 }; }
+
+  leastUsedColor(areas) {
+    var pal = this.palette();
+    var counts = pal.map(function (c) { return areas.filter(function (a) { return a.color === c; }).length; });
+    var min = Math.min.apply(null, counts);
+    return pal[counts.indexOf(min)];
+  }
+
+  // Optimal string alignment distance (Damerau-Levenshtein with adjacent swaps).
+  osa(a, b) {
+    var d = [];
+    for (var i = 0; i <= a.length; i++) { d.push([i]); }
+    for (var j = 1; j <= b.length; j++) d[0][j] = j;
+    for (i = 1; i <= a.length; i++) {
+      for (j = 1; j <= b.length; j++) {
+        var cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+    return d[a.length][b.length];
+  }
+
+  typoNear(q, key) {
+    if (key.length < 4 || q.length < 3) return false;
+    return this.osa(q, key) <= (key.length >= 8 ? 2 : 1);
+  }
+
+  makeArea(name, areas) {
+    var clean = this.cleanName(name);
+    var key = this.nameKey(clean);
+    var existing = areas.find(function (a) { return a.nameKey === key; });
+    if (existing) return existing;
+    return { id: 'ar_' + Date.now().toString(36), name: clean, nameKey: key, color: this.leastUsedColor(areas), createdAt: Date.now() };
+  }
+
+  pinChip(ids, id) { return !id || ids.indexOf(id) >= 0 ? ids : [id].concat(ids).slice(0, 6); }
+
+  // Up to 6 chips for an instrument: most-used there, then seed suggestions, then unused custom areas.
+  rankAreas(inst, selId, items, areas) {
+    items = items || this.state.items;
+    areas = areas || this.state.areas;
+    var here = {}, anywhere = {};
+    items.forEach(function (it) {
+      if (!it.areaId) return;
+      anywhere[it.areaId] = (anywhere[it.areaId] || 0) + 1;
+      if (it.inst === inst) here[it.areaId] = (here[it.areaId] || 0) + 1;
+    });
+    var used = areas.filter(function (a) { return here[a.id]; }).sort(function (a, b) { return here[b.id] - here[a.id] || a.createdAt - b.createdAt; }).map(function (a) { return a.id; });
+    var sg = this.seedSuggest();
+    var sugg = (sg[inst] || sg.other).map(function (k) { var a = areas.find(function (x) { return x.seedKey === k; }); return a ? a.id : null; }).filter(Boolean);
+    var fresh = areas.filter(function (a) { return !a.seedKey && !anywhere[a.id]; }).sort(function (a, b) { return b.createdAt - a.createdAt; }).map(function (a) { return a.id; });
+    var out = [];
+    used.concat(sugg, fresh).forEach(function (id) { if (out.indexOf(id) < 0) out.push(id); });
+    return this.pinChip(out.slice(0, 6), selId);
+  }
+
+  // Suggestion rows for typed text: warm-up row, matches (exact, prefix, substring, typo), Create.
+  matchRows(text) {
+    var self = this;
+    var s = this.state;
+    var q = (text || '').trim();
+    if (!q) return { rows: [], defHi: -1, note: '' };
+    var key = this.nameKey(q);
+    var IM = this.instMeta();
+    var rows = [];
+    var note = '';
+    var warm = this.isWarmKey(key);
+    if (warm) rows.push({ type: 'warm', label: 'Make this a daily warm-up', hint: 'Practice setting', color: this.theme().accent });
+    if (!key) note = 'Use a letter, number or emoji';
+    var reserved = this.isReservedKey(key);
+    if (reserved) note = 'That name is used by a filter';
+    var usage = {};
+    s.items.forEach(function (it) { if (it.areaId) { usage[it.areaId] = usage[it.areaId] || {}; usage[it.areaId][it.inst] = (usage[it.areaId][it.inst] || 0) + 1; } });
+    var hintFor = function (id) {
+      var u = usage[id];
+      if (!u) return 'Unused';
+      var top = Object.keys(u).sort(function (a, b) { return u[b] - u[a]; })[0];
+      return IM[top] ? 'Mostly ' + IM[top].name : '';
+    };
+    var scored = key ? s.areas.map(function (a) {
+      var k = a.nameKey;
+      var t = k === key ? 0 : k.indexOf(key) === 0 ? 1 : k.indexOf(key) > 0 ? 2 : self.typoNear(key, k) ? 3 : 9;
+      return { a: a, t: t };
+    }).filter(function (x) { return x.t < 9; }).sort(function (x, y) { return x.t - y.t || x.a.name.localeCompare(y.a.name); }).slice(0, 6) : [];
+    scored.forEach(function (x) { rows.push({ type: 'area', id: x.a.id, t: x.t, label: x.a.name, hint: hintFor(x.a.id), color: self.dc(x.a.color) }); });
+    var exact = scored.some(function (x) { return x.t === 0; });
+    if (!exact && key && !reserved) {
+      var clean = this.cleanName(q);
+      rows.push({ type: 'create', name: clean, label: 'Create "' + clean + '"', hint: 'New area', color: this.theme().disabled });
+    }
+    var defHi = -1;
+    if (warm) defHi = 0;
+    else {
+      var iE = rows.findIndex(function (r) { return r.type === 'area' && r.t <= 1; });
+      var iT = rows.findIndex(function (r) { return r.type === 'area' && r.t === 3; });
+      var iC = rows.findIndex(function (r) { return r.type === 'create'; });
+      defHi = iE >= 0 ? iE : iT >= 0 ? iT : iC;
+    }
+    return { rows: rows, defHi: defHi, note: note };
+  }
+
+  pickerHi(m) { var h = this.state.pk.hi; return h >= 0 && h < m.rows.length ? h : m.defHi; }
+
+  applyRow(ctx, r) {
+    var self = this;
+    var s = this.state;
+    if (!r) return;
+    if (r.type === 'warm') {
+      if (ctx === 'capture') this.setState({ form: Object.assign({}, s.form, { lane: 'warmup' }), pk: this.blankPk() });
+      else { this.setLane(s.cur, 'warmup'); this.setState({ pk: this.blankPk() }); }
+      return;
+    }
+    if (r.type === 'area') {
+      if (ctx === 'capture') this.setState({ form: Object.assign({}, s.form, { areaId: r.id, pendingArea: null }), pk: this.blankPk(), capChips: this.pinChip(s.capChips, r.id) });
+      else { this.setItemArea(s.cur, r.id); this.closeCardPicker(); }
+      return;
+    }
+    if (r.type === 'create') {
+      if (ctx === 'capture') { this.setState({ form: Object.assign({}, s.form, { areaId: null, pendingArea: r.name }), pk: this.blankPk() }); return; }
+      var a = this.makeArea(r.name, s.areas);
+      var areas = s.areas.indexOf(a) >= 0 ? s.areas : s.areas.concat([a]);
+      this.setState({ areas: areas }, function () { self.setItemArea(self.state.cur, a.id); });
+      this.closeCardPicker();
+      this.flash('New area "' + a.name + '"');
+    }
+  }
+
+  pickerKey(ctx, e) {
+    var s = this.state;
+    var text = s.pk.text.trim();
+    var m = this.matchRows(s.pk.text);
+    var hi = this.pickerHi(m);
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && m.rows.length) {
+      e.preventDefault(); e.stopPropagation();
+      var n = m.rows.length;
+      var h = hi < 0 ? (e.key === 'ArrowDown' ? 0 : n - 1) : (hi + (e.key === 'ArrowDown' ? 1 : n - 1)) % n;
+      this.setState({ pk: { text: s.pk.text, hi: h } });
+      return;
+    }
+    if (e.key === 'Enter' && text) { e.preventDefault(); e.stopPropagation(); this.applyRow(ctx, m.rows[hi]); return; }
+    if (e.key === 'Tab' && text) { this.applyRow(ctx, m.rows[hi]); return; }
+    if (e.key === 'Escape' && s.pk.text) { e.preventDefault(); e.stopPropagation(); this.setState({ pk: this.blankPk() }); return; }
+    if (e.key === 'Escape' && ctx === 'card') { e.stopPropagation(); this.closeCardPicker(); return; }
+    if (e.key === 'Backspace' && !s.pk.text) {
+      if (ctx === 'capture') this.setForm({ areaId: null, pendingArea: null });
+      else this.setItemArea(s.cur, null);
+    }
+  }
+
+  pickChip(ctx, id) {
+    var s = this.state;
+    if (ctx === 'capture') { this.setForm({ areaId: s.form.areaId === id ? null : id, pendingArea: null }); return; }
+    var it = this.item(s.cur);
+    this.setItemArea(s.cur, it && it.areaId === id ? null : id);
+    this.closeCardPicker();
+  }
+
+  setItemNote(id, text) {
+    this.setState({ items: this.state.items.map(function (it) { return it.id === id ? Object.assign({}, it, { noteText: text }) : it; }), noteSavedFor: id });
+  }
+
+  setItemArea(id, areaId) {
+    this.setState({ items: this.state.items.map(function (it) { return it.id === id ? Object.assign({}, it, { areaId: areaId }) : it; }) });
+  }
+
+  // Moving a reviewed warm-up back to Regular/Focus brings it back tomorrow, not weeks out.
+  setLane(id, lane) {
+    var items = this.state.items.map(function (it) {
+      if (it.id !== id || it.lane === lane) return it;
+      var patch = { lane: lane };
+      if (lane === 'warmup' && it.lane !== 'warmup') patch.preWarm = { kind: it.kind, late: it.late, nextLabel: it.nextLabel, reviews: it.reviews };
+      if (it.lane === 'warmup' && it.kind !== 'done' && it.kind !== 'paused' && it.kind !== 'ref') {
+        var pw = it.preWarm;
+        if (pw && pw.reviews === it.reviews) { patch.kind = pw.kind; patch.late = pw.late; patch.nextLabel = pw.nextLabel; }
+        else if (it.reviews > 0) { patch.kind = 'later'; patch.nextLabel = 'tomorrow'; }
+        else patch.kind = 'new';
+        patch.preWarm = null;
+      }
+      return Object.assign({}, it, patch);
+    });
+    this.setState({ items: items });
+  }
+
+  // ---------- Settings › Areas ----------
+  startEdit(id) { var a = this.areaById(id); this._editEl = null; this.setState({ editArea: id, editText: a ? a.name : '', editErr: '', mergeAsk: null }); }
+
+  commitEdit() {
+    var s = this.state;
+    var id = s.editArea;
+    if (!id) return;
+    var a = this.areaById(id);
+    var text = this.cleanName(s.editText);
+    if (!a || !text || text === a.name) { this._refocusArea = id; this.setState({ editArea: null, editErr: '' }); return; }
+    var key = this.nameKey(text);
+    if (!key) { this.setState({ editErr: 'Use a letter, number or emoji' }); return; }
+    if (this.isReservedKey(key)) { this.setState({ editErr: 'That name is used by a filter' }); return; }
+    var other = s.areas.find(function (x) { return x.nameKey === key && x.id !== id; });
+    if (other) { this._mergeEl = null; this.setState({ editArea: null, editErr: '', mergeAsk: { src: id, dst: other.id } }); return; }
+    this._refocusArea = id;
+    this.setState({ areas: s.areas.map(function (x) { return x.id === id ? Object.assign({}, x, { name: text, nameKey: key }) : x; }), editArea: null, editErr: '', undo: null });
+    this.flash(this.isWarmKey(key) ? 'Renamed. To make items come first every day, set them to Warm-up.' : 'Renamed to "' + text + '"');
+  }
+
+  cycleColor(id) {
+    var pal = this.palette();
+    this.setState({ areas: this.state.areas.map(function (a) { return a.id === id ? Object.assign({}, a, { color: pal[(pal.indexOf(a.color) + 1) % pal.length] }) : a; }) });
+  }
+
+  deleteArea(id) {
+    var s = this.state;
+    var a = this.areaById(id);
+    if (!a) return;
+    var ids = s.items.filter(function (it) { return it.areaId === id; }).map(function (it) { return it.id; });
+    this.setState({
+      items: s.items.map(function (it) { return it.areaId === id ? Object.assign({}, it, { areaId: null }) : it; }),
+      areas: s.areas.filter(function (x) { return x.id !== id; }),
+      libArea: s.libArea === id ? 'all' : s.libArea,
+      mergeAsk: null, editArea: null,
+      undo: { type: 'delete', area: a, itemIds: ids }
+    });
+    this.flashUndo('Deleted "' + a.name + '"' + (ids.length ? ' · ' + ids.length + (ids.length === 1 ? ' item now has' : ' items now have') + ' no area' : ''));
+  }
+
+  mergeArea(src, dst) {
+    var s = this.state;
+    var a = this.areaById(src);
+    var b = this.areaById(dst);
+    if (!a || !b) return;
+    var ids = s.items.filter(function (it) { return it.areaId === src; }).map(function (it) { return it.id; });
+    this.setState({
+      items: s.items.map(function (it) { return it.areaId === src ? Object.assign({}, it, { areaId: dst }) : it; }),
+      areas: s.areas.filter(function (x) { return x.id !== src; }),
+      libArea: s.libArea === src ? dst : s.libArea,
+      mergeAsk: null,
+      undo: { type: 'merge', area: a, dst: dst, itemIds: ids }
+    });
+    this.flashUndo('Merged "' + a.name + '" into "' + b.name + '" (' + ids.length + (ids.length === 1 ? ' item' : ' items') + ')');
+  }
+
+  // Undo restores only the items that are still where the change left them.
+  undoArea() {
+    var s = this.state;
+    var u = s.undo;
+    if (!u) return;
+    // Never restore a second area with the same name.
+    var clash = s.areas.find(function (x) { return x.nameKey === u.area.nameKey; });
+    if (clash) { this.setState({ undo: null }); this.flash('Can\'t undo: "' + clash.name + '" now uses that name'); return; }
+    var items = s.items.map(function (it) {
+      if (u.itemIds.indexOf(it.id) < 0) return it;
+      if (u.type === 'delete' && it.areaId === null) return Object.assign({}, it, { areaId: u.area.id });
+      if (u.type === 'merge' && it.areaId === u.dst) return Object.assign({}, it, { areaId: u.area.id });
+      return it;
+    });
+    this.setState({ areas: s.areas.concat([u.area]), items: items, undo: null });
+    this.flash('Restored "' + u.area.name + '"');
+  }
+
+  addAreaFromSettings() {
+    var s = this.state;
+    var text = this.cleanName(s.newAreaText);
+    if (!text) return;
+    var key = this.nameKey(text);
+    if (!key) { this.flash('Use a letter, number or emoji'); return; }
+    if (this.isReservedKey(key)) { this.flash('That name is used by a filter'); return; }
+    var existing = s.areas.find(function (a) { return a.nameKey === key; });
+    if (existing) { this.setState({ newAreaText: '', areaFlash: existing.id }); this.flash('Already there: "' + existing.name + '"'); return; }
+    var a = this.makeArea(text, s.areas);
+    this.setState({ areas: s.areas.concat([a]), newAreaText: '', areaFlash: a.id, undo: null });
+    this.flash(this.isWarmKey(key) ? 'Added. To make items come first every day, set them to Warm-up.' : 'Added area "' + a.name + '"');
+  }
+
+  ratingColors() { var T = this.theme(); return { again: T.again, hard: T.hard, good: T.good, easy: T.easy }; }
+  ratingBorders() { var T = this.theme(); return { again: T.againLine, hard: T.hardLine, good: T.goodLine, easy: T.easyLine }; }
+
+  // ---------- Color schemes: 4 directions x dark/light. Only base colors are hand-picked; the rest is derived. ----------
+  themeBases() {
+    return {
+      // Chosen scheme: soft clay on ink at night, red clay on paper by day.
+      paper: { name: 'Paper & Ink', blurb: 'Ink and soft clay at night, paper and red clay by day',
+        dark: { bg: '#1A1917', text: '#EDE6D6', accent: '#E8876D', onAccent: '#1A0A05', again: '#E8806E', hard: '#E2B65A', good: '#86A8F0', easy: '#6CC4A4', violet: '#B9A5EE' },
+        light: { bg: '#F5F1E8', text: '#1D1C1A', accent: '#A9412A', onAccent: '#FFFFFF', again: '#B23A2E', hard: '#835C00', good: '#2D54C4', easy: '#1A715A', violet: '#6644C2' } },
+      studio: { name: 'Studio Night', blurb: 'Charcoal, warm white, amber record light',
+        dark: { bg: '#111113', text: '#ECE8E1', accent: '#F0A73A', onAccent: '#1B1408', again: '#FF8170', hard: '#F2C14E', good: '#7AAEFF', easy: '#5FD3B5', violet: '#B595FF' },
+        light: { bg: '#F4F2EE', text: '#1B1A18', accent: '#8C4F00', onAccent: '#FFFFFF', again: '#B23A2E', hard: '#835C00', good: '#2D54C4', easy: '#1A715A', violet: '#6644C2' } },
+      console: { name: 'Analog Console', blurb: 'Graphite, cream, burnt orange',
+        dark: { bg: '#17181A', text: '#E9E4D8', accent: '#E8833A', onAccent: '#1A0E05', again: '#F07A6A', hard: '#E8B64C', good: '#6FB7C9', easy: '#8CCB7E', violet: '#B49CF0' },
+        light: { bg: '#EFEBE3', text: '#22201C', accent: '#99430F', onAccent: '#FFFFFF', again: '#A8372A', hard: '#7C5600', good: '#1D6679', easy: '#386F2A', violet: '#6248AE' } },
+      circuit: { name: 'Circuit', blurb: 'Black, white, one signal orange',
+        dark: { bg: '#0B0B0B', text: '#F5F5F2', accent: '#FF5B1F', onAccent: '#140500', again: '#FF6A3D', hard: '#FFC21A', good: '#E8E8E3', easy: '#3FD0C9', violet: '#B9A2FF' },
+        light: { bg: '#F2F2EF', text: '#0B0B0B', accent: '#AE2F00', onAccent: '#FFFFFF', again: '#B22B10', hard: '#765700', good: '#1A1A1A', easy: '#006B66', violet: '#573CBC' } }
+    };
+  }
+
+  // Area and instrument colors are names; each mode resolves them to readable hexes.
+  dataColors(dark) {
+    return dark
+      ? { amber: '#F0A73A', coral: '#FF8170', rose: '#F27FB2', violet: '#B595FF', blue: '#7AAEFF', teal: '#5FD3B5', green: '#9BD46A', slate: '#9AA3B2' }
+      : { amber: '#A86400', coral: '#C9452F', rose: '#B83F78', violet: '#6F4BCF', blue: '#2D5FC8', teal: '#0F7F69', green: '#4A7F1F', slate: '#5A6474' };
+  }
+
+  hexRgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.slice(i, i + 2), 16); }); }
+  mix(a, b, t) {
+    var pa = this.hexRgb(a), pb = this.hexRgb(b);
+    return '#' + pa.map(function (v, i) { var x = Math.round(v + (pb[i] - v) * t); return (x < 16 ? '0' : '') + x.toString(16); }).join('').toUpperCase();
+  }
+
+  buildTheme(dir, mode) {
+    var self = this;
+    var B = this.themeBases()[dir] || this.themeBases().paper;
+    var dark = mode === 'dark';
+    var b = dark ? B.dark : B.light;
+    var W = '#FFFFFF';
+    var up = function (d, l) { return self.mix(b.bg, b.text, dark ? d : l); };
+    var card = function (d, l) { return dark ? self.mix(b.bg, b.text, d) : self.mix(b.bg, W, l); };
+    var tint = function (c, d, l) { return dark ? self.mix(b.bg, c, d) : self.mix(W, c, l); };
+    var T = {
+      dir: dir, mode: mode, dark: dark, name: B.name,
+      bg: b.bg, text: b.text, accent: b.accent, onAccent: b.onAccent,
+      dim: up(0.018, 0.025), side: up(0.023, 0.03),
+      surf: card(0.032, 0.6), surf2: card(0.041, 0.75), surf3: card(0.05, 0.5),
+      raised: up(0.064, 0.05), raised2: up(0.078, 0.065), track: up(0.082, 0.08), sideLine: up(0.087, 0.1),
+      sel: up(0.091, 0.06), sel2: up(0.114, 0.075), sel3: up(0.115, 0.07),
+      line: up(0.096, 0.11), line2: up(0.114, 0.13), line3: up(0.132, 0.15), line4: up(0.155, 0.18), line5: up(0.187, 0.23), line6: up(0.26, 0.32),
+      disabled: up(0.31, 0.4), disabled2: up(0.4, 0.46),
+      faint: up(0.585, 0.68), muted: up(0.7, 0.77), textSoft: up(0.92, 0.9),
+      accentTint: tint(b.accent, 0.12, 0.1), accentTint2: tint(b.accent, 0.18, 0.14), accentLine: tint(b.accent, 0.16, 0.35),
+      heat1: tint(b.accent, 0.3, 0.3), heat2: tint(b.accent, 0.6, 0.62),
+      onAccentLine: this.mix(b.accent, b.onAccent, 0.35),
+      again: b.again, hard: b.hard, good: b.good, easy: b.easy, violet: b.violet,
+      againLine: tint(b.again, 0.35, 0.45), hardLine: tint(b.hard, 0.35, 0.45), goodLine: tint(b.good, 0.35, 0.45), easyLine: tint(b.easy, 0.35, 0.45),
+      againTint: tint(b.again, 0.17, 0.1), againTint2: tint(b.again, 0.11, 0.07), goodTint: tint(b.good, 0.15, 0.1), easyTint: tint(b.easy, 0.15, 0.1), violetTint: tint(b.violet, 0.15, 0.1),
+      overlay: dark ? 'rgba(8,8,10,0.74)' : 'rgba(30,28,24,0.42)',
+      shadow: dark ? 'rgba(0,0,0,0.5)' : 'rgba(30,28,24,0.18)',
+      // A video player stays black and a PDF page stays paper in both modes.
+      vid: '#0B0B0D', vidLine: '#26262B', vidText: '#A9A59D',
+      paper: '#F3F0E9', paperInk: '#1A1A1E', paperLine: '#9C978D', paperMuted: '#55514A',
+      data: this.dataColors(dark)
+    };
+    return T;
+  }
+
+  modeNow() {
+    var m = this.state && this.state.modeOverride ? this.state.modeOverride : (this.props.mode || 'system');
+    if (m === 'dark' || m === 'light') return m;
+    return this.sysDark === false ? 'light' : 'dark';
+  }
+  paletteNow() { return (this.state && this.state.paletteOverride) || this.props.palette || 'paper'; }
+  theme() {
+    var dir = this.paletteNow(), mode = this.modeNow(), key = dir + '/' + mode;
+    if (!this._theme || this._themeKey !== key) { this._theme = this.buildTheme(dir, mode); this._themeKey = key; }
+    return this._theme;
+  }
+  dc(name) { var d = this.theme().data; return d[name] || name; }
+
+  norm(it) {
+    var base = { artist: '', key: '', areaId: null, lane: 'normal', tags: [], created: 0, preWarm: null, late: 0, target: null, best: null, stage: 'Review', reviews: 0, last: 'Not yet', notes: [], next: { again: '1d', hard: '3d', good: '7d', easy: '12d' }, loopA: '0:30', loopB: '0:52', nextLabel: '', rated: null, prevKind: null };
+    var out = Object.assign({}, base, it);
+    out.media = Object.assign({ video: '', pdf: '', pages: 1, images: [], takes: [] }, it.media || {});
+    // Notes are one freeform text per item.
+    if (out.noteText == null) out.noteText = (out.notes || []).join('\n');
+    return out;
+  }
+
+  seed() {
+    var NEWN = { again: '1d', hard: '1d', good: '2d', easy: '4d' };
+    var DAILY = { again: '1d', hard: '1d', good: '1d', easy: '1d' };
+    var raw = [
+      { id: 'spider', title: 'Spider exercise', inst: 'guitar', areaId: 'seed-technique', lane: 'warmup', kind: 'due', target: 100, best: 88, reviews: 21, last: 'Yesterday · Good', notes: ['Keep fingers close to the frets', 'Alternate picking, no gaps between strings'], media: { video: 'Spider exercise demo' }, next: DAILY },
+      { id: 'trills', title: 'Lip trills, 5-note scale', inst: 'voice', areaId: null, lane: 'warmup', kind: 'due', reviews: 14, last: 'Yesterday · Good', notes: ['Steady air, loose jaw'], media: { video: 'Lip trill warm-up' }, next: DAILY },
+      { id: 'wing', title: 'Little Wing intro', artist: 'Jimi Hendrix', inst: 'guitar', areaId: 'seed-repertoire', lane: 'focus', kind: 'due', late: 2, key: 'Em', target: 70, best: 62, stage: 'Learning', reviews: 7, last: 'Oct 1 · Hard', noteText: 'Thumb over the neck for the bass notes. Let the double-stops ring into each other.\n\nBars 3–4 are the hard part: loop them slow before speeding up.\n\n0:42 in the lesson is where he shows the hammer-on pattern.\nTeacher, Sep 28: "relax the fretting hand between phrases."', media: { video: 'Intro lesson', pdf: 'Little-Wing-intro.pdf', pages: 3, images: ['Chord shape, 7th position', 'Hammer-on pattern'], takes: [{ label: 'Take 3', date: 'Oct 1', len: '0:48', bpm: 58 }, { label: 'Take 2', date: 'Sep 27', len: '0:51', bpm: 54 }, { label: 'First clean take', date: 'Sep 20', len: '0:44', bpm: 50, ref: true }] }, loopA: '0:42', loopB: '1:08', next: { again: '1d', hard: '4d', good: '9d', easy: '16d' } },
+      { id: 'para', title: 'Paradiddle-diddle', inst: 'drums', areaId: 'seed-rudiment', lane: 'focus', kind: 'due', late: 0, target: 120, best: 104, stage: 'Learning', reviews: 9, last: 'Oct 3 · Good', notes: ['Accent on 1 only', 'Even stick heights'], media: { video: 'Rudiment demo', takes: [{ label: 'Take 1', date: 'Oct 3', len: '1:02', bpm: 104 }] }, next: { again: '1d', hard: '3d', good: '7d', easy: '12d' } },
+      { id: 'penta', title: 'Minor pentatonic, box 1', inst: 'guitar', areaId: 'seed-scale', kind: 'due', late: 5, key: 'A', target: 140, best: 126, stage: 'Review', reviews: 12, last: 'Sep 24 · Good', notes: ['Up and down in triplets', 'Start on the 5th fret'], media: { pdf: 'Pentatonic-boxes.pdf', pages: 2, images: ['Box 1 diagram'] }, next: { again: '2d', hard: '6d', good: '14d', easy: '24d' } },
+      { id: 'two5', title: 'ii–V–I voicings in B♭', inst: 'piano', areaId: 'seed-voicing', kind: 'due', late: 0, key: 'B♭', target: 90, best: 80, stage: 'Learning', reviews: 5, last: 'Sep 30 · Hard', notes: ['Rootless voicings', 'Left hand alone first'], media: { pdf: 'Voicings-sheet.pdf', pages: 1 }, next: { again: '1d', hard: '3d', good: '6d', easy: '11d' } },
+      { id: 'hyst', title: 'Hysteria intro', artist: 'Muse', inst: 'bass', areaId: 'seed-repertoire', kind: 'new', target: 94, stage: 'New', notes: ['First 4 bars at 60 before anything else'], media: { video: 'Bass lesson' }, next: NEWN },
+      { id: 'walk', title: 'Walking line over F blues', inst: 'bass', areaId: 'seed-walking-line', kind: 'new', target: 120, stage: 'New', next: NEWN },
+      { id: 'moon', title: 'Moonlight Sonata, bars 1–16', artist: 'Beethoven', inst: 'piano', areaId: 'seed-repertoire', kind: 'new', stage: 'New', media: { pdf: 'Moonlight-mvt1.pdf', pages: 6 }, next: NEWN },
+      { id: 'breath', title: 'Breathing: 4 in, 8 out', inst: 'voice', areaId: null, kind: 'new', stage: 'New', next: NEWN },
+      { id: 'three', title: 'Major scale, 3 notes per string', inst: 'guitar', areaId: 'seed-scale', kind: 'done', prevKind: 'due', rated: 'good', nextLabel: 'in 12d', target: 120, best: 112, reviews: 15, last: 'Today · Good', next: { again: '2d', hard: '6d', good: '12d', easy: '20d' } },
+      { id: 'money', title: 'Money beat with ghost notes', inst: 'drums', areaId: 'seed-groove', kind: 'done', prevKind: 'due', rated: 'hard', nextLabel: 'in 3d', target: 96, best: 88, stage: 'Learning', reviews: 6, last: 'Today · Hard', next: { again: '1d', hard: '3d', good: '7d', easy: '12d' } },
+      { id: 'ivls', title: 'Interval ID: 3rds vs 4ths', inst: 'guitar', areaId: 'seed-ear-training', kind: 'later', nextLabel: 'in 8d', reviews: 10, last: 'Sep 28 · Good' },
+      { id: 'seven', title: 'Seven Nation Army riff', artist: 'The White Stripes', inst: 'guitar', areaId: 'ar_gigset', kind: 'later', stage: 'Mastered', nextLabel: 'in 41d', target: 124, best: 124, reviews: 11, last: 'Aug 26 · Easy' },
+      { id: 'moby', title: 'Moby Dick fill', artist: 'Led Zeppelin', inst: 'drums', areaId: 'seed-fill', kind: 'paused', reviews: 3, last: 'Aug 12 · Again' },
+      { id: 'chart', title: 'Open chord chart', inst: 'guitar', areaId: 'seed-chord', kind: 'ref', media: { images: ['Open chords, all keys'] } }
+    ];
+    var self = this;
+    return raw.map(function (it) { return self.norm(it); });
+  }
+
+  seedLogs() {
+    return [
+      { id: 'l1', date: 'Mon, Oct 5', min: 22, items: 8, mix: { again: 1, hard: 1, good: 5, easy: 1 }, note: 'Paradiddle-diddles finally even at 104.' },
+      { id: 'l2', date: 'Sun, Oct 4', min: 35, items: 11, mix: { again: 2, hard: 2, good: 6, easy: 1 }, note: 'Little Wing: thumb chords still muddy. Looped bars 3–4 at 50%.' },
+      { id: 'l3', date: 'Sat, Oct 3', min: 18, items: 6, mix: { again: 0, hard: 1, good: 4, easy: 1 }, note: '' },
+      { id: 'l4', date: 'Fri, Oct 2', min: 27, items: 9, mix: { again: 1, hard: 2, good: 5, easy: 1 }, note: 'Recorded a clean take of the pentatonic run.' },
+      { id: 'l5', date: 'Thu, Oct 1', min: 41, items: 12, mix: { again: 2, hard: 3, good: 6, easy: 1 }, note: 'Long one. Left hand tired by the end. Shorter sessions work better.' }
+    ];
+  }
+
+  notesData() {
+    return [
+      { id: 'how', title: 'How I practice', tag: 'General', edited: 'Edited Oct 2', body: ['Warm up for five minutes, then play whatever Today gives me. No browsing the Library mid-session.', 'If something falls apart twice, drop to 75% speed and loop just the hard bar.', 'Record a take whenever a Focus item feels clean, so there is a reference to compare against later.'], embed: null },
+      { id: 'lesson', title: 'Lesson notes, Sep 28', tag: 'Teacher', edited: 'Edited Sep 28', body: ['Relax the fretting hand between phrases.', 'Check bends against the fretted target note before moving on.'], embed: { kind: 'Recording', title: 'Lesson recap', meta: '4:12 · audio' } },
+      { id: 'tone', title: 'Tone settings', tag: 'Gear', edited: 'Edited Sep 20', body: ['Clean: neck pickup, gain 3, bass 5, mid 6, treble 5.', 'Crunch: bridge pickup, gain 6, mids up a notch.'], embed: { kind: 'Image', title: 'Pedalboard photo', meta: 'JPG · pasted from clipboard' } },
+      { id: 'res', title: 'Resources', tag: 'Links', edited: 'Edited Sep 14', body: ['Courses, channels and books I am learning from.'], embed: { kind: 'Link', title: '[Your course] lesson library', meta: 'courses.example.com' } }
+    ];
+  }
+
+  // Instrument: sidebar filter, else last used, else Guitar. Area: the Library's area filter, if one is set.
+  blankForm() {
+    var st = this.state;
+    var inst = st && st.inst !== 'all' ? st.inst : (st && st.lastInst) || 'guitar';
+    var areaId = st && st.screen === 'library' && st.libArea && st.libArea !== 'all' && st.libArea !== 'none' ? st.libArea : null;
+    return { name: '', inst: inst, areaId: areaId, pendingArea: null, lane: 'normal', bpm: '', link: '', noteText: '', attachments: [] };
+  }
+
+  initState(start) {
+    var self = this;
+    var s = {
+      screen: 'today', capture: false, summary: false, inst: 'all', budget: 'all', items: this.seed(), areas: this.seedAreas(),
+      queue: [], cur: null, tab: 'video', loop: true, speed: 85, playing: false, pdfPage: 1, rec: false,
+      bpm: 80, metroOn: false, beat: 0, clean: '', sessionLog: [], startedAt: null, sessionMinutes: null, note: '',
+      form: this.blankForm(), pk: this.blankPk(), capChips: [], cardChips: [], cardPicker: false, lastInst: null,
+      libQuery: '', libStatus: 'active', libArea: 'all', libAreaOpen: false, noteSel: 'how', simple: null,
+      editArea: null, editText: '', editErr: '', mergeAsk: null, newAreaText: '', areaFlash: null, undo: null,
+      notionOpen: false, notionInst: 'guitar', paletteOverride: null, modeOverride: null, instruments: this.defaultInstruments(), instDraft: null,
+      retention: 90, maxIvl: 60, newPerDay: 3, autoBackup: false, lastBackup: 'Oct 4', showDone: true, toast: '', toastUndo: false, logs: this.seedLogs()
+    };
+    if (['practice', 'library', 'notes', 'log', 'settings'].indexOf(start) >= 0) s.screen = start;
+    if (start === 'capture') {
+      s.capture = true;
+      s.form = { name: 'Billie Jean bass line', inst: 'bass', areaId: 'seed-groove', pendingArea: null, lane: 'focus', bpm: '', link: 'https://youtu.be/your-lesson-link', noteText: 'Groove first, fills later. Keep the 8ths dead even.', attachments: [] };
+    }
+    if (start === 'capture-new') {
+      s.capture = true;
+      s.form = { name: 'Slap groove in E', inst: 'bass', areaId: null, pendingArea: null, lane: 'normal', bpm: '', link: '', noteText: 'Thumb rests on the E string between slaps. Pop with the index, not the middle finger.', attachments: [{ id: 'at-1', kind: 'image', name: 'Thumb position', url: '' }, { id: 'at-2', kind: 'image', name: 'Bar 2 fingering', url: '' }] };
+      s.pk = { text: 'Slap', hi: -1 };
+    }
+    if (s.capture) s.capChips = this.rankAreas(s.form.inst, s.form.areaId, s.items, s.areas);
+    if (start === 'practice') {
+      s.queue = this.computeQueue(s).ids;
+      s.items = s.items.map(function (it) {
+        return (it.id === 'spider' || it.id === 'trills') ? Object.assign({}, it, { prevKind: it.kind, kind: 'done', rated: 'good', nextLabel: 'tomorrow' }) : it;
+      });
+      s.sessionLog = [{ id: 'spider', r: 'good' }, { id: 'trills', r: 'good' }];
+      s.cur = 'wing'; s.bpm = 62; s.tab = 'video'; s.startedAt = Date.now() - 872000;
+    }
+    if (start === 'session') {
+      var ids = this.computeQueue(s).ids;
+      var seq = ['good', 'good', 'easy', 'good', 'hard', 'good', 'again', 'good', 'good'];
+      s.items = s.items.map(function (it) {
+        var i = ids.indexOf(it.id);
+        if (i < 0) return it;
+        var r = seq[i % seq.length];
+        return Object.assign({}, it, { prevKind: it.kind, kind: 'done', rated: r, nextLabel: self.ivlLabel(it.next[r]) });
+      });
+      s.sessionLog = ids.map(function (id, i) { return { id: id, r: seq[i % seq.length] }; });
+      s.summary = true; s.sessionMinutes = 26;
+    }
+    return s;
+  }
+
+  computeQueue(s) {
+    var inF = function (it) { return s.inst === 'all' || it.inst === s.inst; };
+    var byLate = function (a, b) { return b.late - a.late; };
+    var all = s.items;
+    // Lane drives Today; areas never do. Warm-ups ignore due dates and never use a New slot.
+    var active = function (it) { return it.kind !== 'done' && it.kind !== 'paused' && it.kind !== 'ref'; };
+    var newAll = all.filter(function (it) { return it.kind === 'new' && it.lane !== 'warmup'; });
+    var newGlobal = newAll.slice(0, s.newPerDay);
+    var warm = all.filter(function (it) { return it.lane === 'warmup' && active(it) && inF(it); }).sort(function (a, b) { return a.created - b.created; });
+    var focus = all.filter(function (it) { return it.kind === 'due' && it.lane === 'focus' && inF(it); }).sort(byLate);
+    var due = all.filter(function (it) { return it.kind === 'due' && it.lane === 'normal' && inF(it); }).sort(byLate);
+    var fresh = newGlobal.filter(inF);
+    var ordered = warm.concat(focus, due, fresh);
+    var cap = { '15': 5, '20': 7, '30': 10, 'all': 9999 }[s.budget];
+    var kept = ordered.slice(0, cap);
+    return {
+      warm: warm, focus: focus, due: due, fresh: fresh, ordered: ordered, kept: kept,
+      ids: kept.map(function (it) { return it.id; }),
+      waiting: newAll.length - newGlobal.length,
+      cut: ordered.length - kept.length
+    };
+  }
+
+  item(id, items) { return (items || this.state.items).find(function (it) { return it.id === id; }); }
+  ivlLabel(v) { return v === '1d' ? 'tomorrow' : 'in ' + v; }
+  capWord(w) { return w.charAt(0).toUpperCase() + w.slice(1); }
+  defaultTab(it) { var m = it.media; return m.video ? 'video' : m.pdf ? 'pdf' : m.images.length ? 'images' : m.takes.length ? 'takes' : 'video'; }
+  isSimple() { return this.state.simple != null ? this.state.simple : !!this.props.simple; }
+
+  flash(msg) {
+    this.toastMs = 2800;
+    this.setState({ toast: msg, toastUndo: false });
+    this.toastResume();
+  }
+
+  // Undo toast: 10 s, paused while hovered or focused. Duration lives on the instance, not in state.
+  flashUndo(msg) {
+    this.toastMs = 10000;
+    this._undoEl = null;
+    this.setState({ toast: msg, toastUndo: true });
+    this.toastResume();
+  }
+  toastHold() { clearTimeout(this.toastT); }
+  toastResume() {
+    var self = this;
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(function () { self.setState({ toast: '', toastUndo: false }); }, this.toastMs || 2800);
+  }
+
+  go(screen) { this.stopMetro(); this.setState({ screen: screen, capture: false, playing: false, cardPicker: false, libAreaOpen: false }); }
+
+  openCapture() {
+    var f = this.blankForm();
+    this._nameEl = null;
+    this.setState({ capture: true, form: f, pk: this.blankPk(), capChips: this.rankAreas(f.inst, f.areaId), libAreaOpen: false });
+  }
+
+  closeCardPicker(extra) {
+    var self = this;
+    this.setState(Object.assign({ cardPicker: false, pk: this.blankPk() }, extra || {}), function () { if (self._areaBtnEl) self._areaBtnEl.focus(); });
+  }
+
+  openCardPicker() {
+    var it = this.item(this.state.cur);
+    if (!it) return;
+    if (this.state.cardPicker) { this.closeCardPicker(); return; }
+    this._pickEl = null;
+    this.setState({ cardPicker: true, pk: this.blankPk(), cardChips: this.rankAreas(it.inst, it.areaId) });
+  }
+
+  practiceState(it) {
+    return { cur: it.id, tab: this.defaultTab(it), bpm: it.best || it.target || 80, clean: '', playing: false, pdfPage: 1, rec: false, cardPicker: false, pk: this.blankPk() };
+  }
+
+  startSession() {
+    var q = this.computeQueue(this.state);
+    if (!q.ids.length) return;
+    var first = this.item(q.ids[0]);
+    this.stopMetro();
+    this.setState(Object.assign({ screen: 'practice', queue: q.ids, startedAt: this.state.startedAt || Date.now() }, this.practiceState(first)));
+  }
+
+  openItem(id) {
+    var s = this.state;
+    var it = this.item(id);
+    var queue = s.queue.indexOf(id) >= 0 ? s.queue : [id].concat(this.computeQueue(s).ids.filter(function (x) { return x !== id; }));
+    this.stopMetro();
+    this.setState(Object.assign({ screen: 'practice', queue: queue, capture: false, startedAt: s.startedAt || Date.now() }, this.practiceState(it)));
+  }
+
+  nextInQueue(items, fromId) {
+    var q = this.state.queue;
+    var isOpen = function (x) { var f = items.find(function (i) { return i.id === x; }); return f && f.kind !== 'done'; };
+    var idx = q.indexOf(fromId);
+    return q.slice(idx + 1).find(isOpen) || q.find(function (x) { return x !== fromId && isOpen(x); });
+  }
+
+  rate(r) {
+    var s = this.state;
+    var self = this;
+    var id = s.cur;
+    var clean = parseInt(s.clean, 10);
+    var items = s.items.map(function (it) {
+      if (it.id !== id) return it;
+      return Object.assign({}, it, {
+        prevKind: it.kind === 'done' ? it.prevKind : it.kind,
+        kind: 'done', rated: r, nextLabel: self.ivlLabel(it.next[r]),
+        best: clean > 0 && clean > (it.best || 0) ? clean : it.best,
+        reviews: it.reviews + (it.kind === 'done' ? 0 : 1),
+        last: 'Today · ' + self.capWord(r),
+        stage: it.stage === 'New' ? 'Learning' : it.stage
+      });
+    });
+    var log = s.sessionLog.filter(function (e) { return e.id !== id; }).concat([{ id: id, r: r }]);
+    var nxt = this.nextInQueue(items, id);
+    this.stopMetro();
+    if (nxt) {
+      var n = items.find(function (i) { return i.id === nxt; });
+      this.setState(Object.assign({ items: items, sessionLog: log }, this.practiceState(n)));
+    } else {
+      this.setState({ items: items, sessionLog: log, clean: '', summary: true, screen: 'today', playing: false });
+    }
+  }
+
+  skip() {
+    var nxt = this.nextInQueue(this.state.items, this.state.cur);
+    if (!nxt) { this.flash('Nothing else left in this session'); return; }
+    this.stopMetro();
+    this.setState(this.practiceState(this.item(nxt)));
+  }
+
+  rerate(id) {
+    var self = this;
+    var items = this.state.items.map(function (it) {
+      return it.id === id ? Object.assign({}, it, { kind: it.prevKind || 'due', rated: null, nextLabel: '' }) : it;
+    });
+    this.setState({ items: items, sessionLog: this.state.sessionLog.filter(function (e) { return e.id !== id; }) }, function () { self.openItem(id); });
+  }
+
+  endSession() {
+    this.stopMetro();
+    if (this.state.sessionLog.length) this.setState({ summary: true, screen: 'today', playing: false });
+    else this.setState({ screen: 'today', playing: false });
+  }
+
+  mixCounts(log) {
+    var m = { again: 0, hard: 0, good: 0, easy: 0 };
+    log.forEach(function (e) { m[e.r] += 1; });
+    return m;
+  }
+
+  sessionMins() {
+    var s = this.state;
+    if (s.sessionMinutes != null) return s.sessionMinutes;
+    return Math.max(1, Math.round((Date.now() - (s.startedAt || Date.now())) / 60000));
+  }
+
+  saveSession() {
+    var s = this.state;
+    var entry = { id: 'l' + Date.now(), date: 'Today', min: this.sessionMins(), items: s.sessionLog.length, mix: this.mixCounts(s.sessionLog), note: s.note.trim() };
+    this.setState({ logs: [entry].concat(s.logs), summary: false, screen: 'log', sessionLog: [], startedAt: null, queue: [], note: '', sessionMinutes: null });
+  }
+
+  setForm(patch) { this.setState({ form: Object.assign({}, this.state.form, patch) }); }
+
+  // Switching instrument keeps the chosen area and only re-ranks the chips.
+  pickInst(id) {
+    var f = this.state.form;
+    this.setState({ form: Object.assign({}, f, { inst: id }), capChips: this.rankAreas(id, f.areaId) });
+  }
+
+  detect(link) {
+    var l = (link || '').trim();
+    if (!l) return '';
+    if (/youtu\.?be/i.test(l)) return 'youtube';
+    if (/\.pdf($|\?)/i.test(l)) return 'pdf';
+    if (/^https?:\/\//i.test(l)) return 'link';
+    return '';
+  }
+
+  // keep = Shift+Enter: save, keep instrument/area/setting, clear the rest, stay open.
+  addItem(practice, keep) {
+    var self = this;
+    var s = this.state;
+    var form = Object.assign({}, s.form);
+    var name = form.name.trim();
+    if (!name) return;
+    // Text still typed in the area box is committed first, so what you see is what gets saved.
+    if (s.pk.text.trim()) {
+      var m = this.matchRows(s.pk.text);
+      var r = m.rows[this.pickerHi(m)];
+      if (r && r.type === 'warm') form.lane = 'warmup';
+      if (r && r.type === 'area') { form.areaId = r.id; form.pendingArea = null; }
+      if (r && r.type === 'create') { form.areaId = null; form.pendingArea = r.name; }
+    }
+    // A new area is created only together with the item.
+    var areas = s.areas;
+    var created = null;
+    var areaId = form.areaId;
+    if (form.pendingArea) {
+      var a = this.makeArea(form.pendingArea, areas);
+      if (areas.indexOf(a) < 0) { areas = areas.concat([a]); created = a; }
+      areaId = a.id;
+    }
+    if (areaId && !this.areaById(areaId, areas)) areaId = null;
+    var det = this.detect(form.link);
+    var it = this.norm({
+      id: 'n' + Date.now(), created: Date.now(), title: name, inst: form.inst, areaId: areaId, lane: form.lane, kind: 'new',
+      target: parseInt(form.bpm, 10) || null, stage: 'New',
+      noteText: form.noteText || '',
+      media: {
+        video: det === 'youtube' ? 'From your link' : '',
+        pdf: det === 'pdf' ? 'From your link' : ((form.attachments || []).find(function (x) { return x.kind === 'pdf'; }) || {}).name || '',
+        images: (form.attachments || []).filter(function (x) { return x.kind === 'image'; }).map(function (x) { return { name: x.name, url: x.url }; }),
+        takes: (form.attachments || []).filter(function (x) { return x.kind === 'audio'; }).map(function (x) { return { label: x.name, date: 'Today', len: '—' }; })
+      },
+      next: { again: '1d', hard: '1d', good: '2d', easy: '4d' }
+    });
+    var items = [it].concat(s.items);
+    var msg = 'Added "' + name + '"' + (created ? ' · new area "' + created.name + '"' : '');
+    if (keep) {
+      var nf = { name: '', inst: form.inst, areaId: areaId, pendingArea: null, lane: form.lane, bpm: '', link: '', noteText: '', attachments: [] };
+      this.setState({ items: items, areas: areas, form: nf, pk: this.blankPk(), lastInst: form.inst, capChips: this.rankAreas(form.inst, areaId, items, areas) }, function () {
+        if (self._nameEl) self._nameEl.focus();
+      });
+      this.flash(msg + '. Next one?');
+      return;
+    }
+    this.setState({ items: items, areas: areas, capture: false, pk: this.blankPk(), lastInst: form.inst }, function () {
+      if (practice) self.openItem(it.id);
+      else self.flash(msg + '. It shows up in Today under ' + (form.lane === 'warmup' ? 'Warm-up.' : 'New.'));
+    });
+  }
+
+  startMetro(bpm) {
+    var self = this;
+    clearInterval(this.metro);
+    var b = bpm || this.state.bpm;
+    this.metro = setInterval(function () { self.setState(function (st) { return { beat: (st.beat + 1) % 4 }; }); }, 60000 / b);
+  }
+
+  stopMetro() {
+    clearInterval(this.metro);
+    this.metro = null;
+    if (this.state && this.state.metroOn) this.setState({ metroOn: false, beat: 0 });
+  }
+
+  toggleMetro() {
+    if (this.state.metroOn) { this.stopMetro(); return; }
+    this.setState({ metroOn: true, beat: 0 });
+    this.startMetro();
+  }
+
+  setBpmVal(b) {
+    b = Math.max(30, Math.min(300, b));
+    this.setState({ bpm: b });
+    if (this.state.metroOn) this.startMetro(b);
+  }
+
+  tap() {
+    var now = Date.now();
+    this.taps = this.taps.filter(function (t) { return now - t < 2500; }).concat([now]);
+    if (this.taps.length < 2) return;
+    var total = 0;
+    for (var i = 1; i < this.taps.length; i++) total += this.taps[i] - this.taps[i - 1];
+    this.setBpmVal(Math.round(60000 / (total / (this.taps.length - 1))));
+  }
+
+  practiceKey(e) {
+    var tag = e.target && e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    var order = this.isSimple() ? ['again', 'good'] : ['again', 'hard', 'good', 'easy'];
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= order.length) { e.preventDefault(); this.rate(order[n - 1]); return; }
+    if (e.key === 'l' || e.key === 'L') this.setState({ loop: !this.state.loop });
+  }
+
+  componentDidMount() {
+    var self = this;
+    try {
+      this._mq = window.matchMedia('(prefers-color-scheme: dark)');
+      this._mqFn = function (e) { self.sysDark = e.matches; self.forceUpdate(); };
+      if (this._mq.addEventListener) this._mq.addEventListener('change', this._mqFn); else if (this._mq.addListener) this._mq.addListener(this._mqFn);
+    } catch (e) { this._mq = null; }
+    this.ticker = setInterval(function () {
+      if (self.state.screen === 'practice' && !self.state.summary) self.forceUpdate();
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    try { if (this._mq) { if (this._mq.removeEventListener) this._mq.removeEventListener('change', this._mqFn); else if (this._mq.removeListener) this._mq.removeListener(this._mqFn); } } catch (e) {}
+    clearInterval(this.ticker);
+    clearInterval(this.metro);
+    clearTimeout(this.toastT);
+  }
+
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    var T = this.theme();
+    var accent = T.accent;
+    var simple = this.isSimple();
+    var IM = this.instMeta();
+    Object.keys(IM).forEach(function (k) { IM[k].color = self.dc(IM[k].color); });
+    var RC = this.ratingColors();
+    var RB = this.ratingBorders();
+    var q = this.computeQueue(s);
+    var keptIds = q.ids;
+    var inKept = function (it) { return keptIds.indexOf(it.id) >= 0; };
+    var inF = function (it) { return s.inst === 'all' || it.inst === s.inst; };
+
+    var chipFor = function (it) {
+      if (it.lane === 'warmup' && it.kind !== 'done') return { t: 'Daily', fg: T.muted, bg: T.track, ring: T.easy, fill: 'transparent' };
+      if (it.kind === 'new') return { t: 'New', fg: T.good, bg: T.goodTint, ring: T.good, fill: T.good };
+      if (it.kind === 'due' && it.late > 0) return { t: it.late + 'd overdue', fg: T.again, bg: T.againTint, ring: T.again, fill: 'transparent' };
+      if (it.kind === 'due') return { t: 'Due today', fg: accent, bg: T.accentTint2, ring: accent, fill: 'transparent' };
+      return { t: it.nextLabel || '', fg: T.muted, bg: T.track, ring: T.disabled, fill: 'transparent' };
+    };
+
+    var deco = function (it) {
+      var m = IM[it.inst];
+      var c = chipFor(it);
+      var ar = self.areaById(it.areaId);
+      return Object.assign({}, it, {
+        instName: m.name, instColor: m.color,
+        areaName: ar ? ar.name : '', areaColor: ar ? self.dc(ar.color) : 'transparent', hasArea: !!ar,
+        // Area is left out when empty, so there is never a dangling separator.
+        meta: [m.name, ar ? ar.name : '', it.artist].filter(Boolean).join(' · '),
+        chip: c.t, chipFg: c.fg, chipBg: c.bg, ring: c.ring, fill: c.fill,
+        isFocus: it.lane === 'focus',
+        bpmText: it.target ? (it.best ? it.best + ' / ' + it.target : '→ ' + it.target) + ' bpm' : '',
+        ratedLabel: it.rated ? self.capWord(it.rated) : '',
+        ratedColor: it.rated ? RC[it.rated] : T.muted,
+        open: function () { self.openItem(it.id); },
+        rerate: function () { self.rerate(it.id); }
+      });
+    };
+
+    // ---- nav + sidebar
+    var navItem = function (id) {
+      var on = s.screen === id || (id === 'today' && s.screen === 'practice');
+      return { bg: on ? T.sel : 'transparent', fg: on ? T.text : T.muted, go: function () { self.go(id); } };
+    };
+    var everything = this.computeQueue(Object.assign({}, s, { inst: 'all', budget: 'all' })).ordered;
+    var instList = [{ id: 'all', name: 'All', color: T.disabled2 }].concat(Object.keys(IM).map(function (k) { return { id: k, name: IM[k].name, color: IM[k].color }; })).map(function (x) {
+      var on = s.inst === x.id;
+      return {
+        name: x.name, color: x.color, on: on,
+        count: x.id === 'all' ? everything.length : everything.filter(function (it) { return it.inst === x.id; }).length,
+        bg: on ? T.raised2 : 'transparent', fg: on ? T.text : T.muted,
+        pick: function () { self.setState({ inst: x.id }); }
+      };
+    });
+
+    // ---- today
+    var warm = q.warm.filter(inKept).map(deco);
+    var focus = q.focus.filter(inKept).map(deco);
+    var due = q.due.filter(inKept).map(deco);
+    var fresh = q.fresh.filter(inKept).map(deco);
+    var done = s.items.filter(function (it) { return it.kind === 'done' && inF(it); }).map(deco);
+    var budgetMin = { '15': 15, '20': 20, '30': 30 }[s.budget];
+    var budgets = [['15', '15m'], ['20', '20m'], ['30', '30m'], ['all', 'All']].map(function (b) {
+      var on = s.budget === b[0];
+      return { label: b[1], on: on, bg: on ? T.sel3 : 'transparent', fg: on ? T.text : T.muted, pick: function () { self.setState({ budget: b[0] }); } };
+    });
+    var anyDone = s.items.some(function (it) { return it.kind === 'done'; });
+    var streak = 8 + (anyDone ? 1 : 0);
+
+    // ---- practice
+    var curRaw = (s.cur && this.item(s.cur)) || s.items[0];
+    var cur = deco(curRaw);
+    var cm = curRaw.media;
+    var bits = [];
+    if (curRaw.artist) bits.push(curRaw.artist);
+    if (curRaw.key) bits.push('Key ' + curRaw.key);
+    cur.metaRest = bits.length ? '· ' + bits.join(' · ') : '';
+    cur.areaLabel = cur.hasArea ? cur.areaName : '+ Area';
+    cur.areaFg = cur.hasArea ? T.text : T.faint;
+    cur.areaBorderStyle = cur.hasArea ? 'solid' : 'dashed';
+    cur.areaAria = cur.hasArea ? 'Area: ' + cur.areaName + '. Change area' : 'Add an area';
+    cur.noteText = curRaw.noteText;
+    cur.imageList = cm.images.map(function (l) { var o = typeof l === 'string' ? { label: l, url: '' } : { label: l.name, url: l.url || '' }; o.hasUrl = !!o.url; o.noUrl = !o.url; return o; });
+    cur.takeList = cm.takes.map(function (tk) { return Object.assign({}, tk, { aria: 'Play ' + tk.label, bpmText: tk.bpm ? '· ' + tk.bpm + ' bpm' : '', isRef: !!tk.ref }); });
+    cur.noTakes = cm.takes.length === 0;
+    cur.mediaVideo = cm.video;
+    cur.mediaPdf = cm.pdf ? cm.pdf + ' · ' + cm.pages + (cm.pages === 1 ? ' page' : ' pages') : '';
+    cur.pages = cm.pages;
+    cur.tempoPct = curRaw.target && curRaw.best ? Math.min(100, Math.round(curRaw.best / curRaw.target * 100)) + '%' : '0%';
+    cur.tempoText = curRaw.target ? (curRaw.best || '—') + ' / ' + curRaw.target + ' bpm' : 'No target yet';
+
+    var tabDefs = [
+      { id: 'video', label: 'Video', count: cm.video ? '1' : '' },
+      { id: 'pdf', label: 'Tab / PDF', count: cm.pdf ? String(cm.pages) + 'p' : '' },
+      { id: 'images', label: 'Images', count: cm.images.length ? String(cm.images.length) : '' },
+      { id: 'takes', label: 'Takes', count: cm.takes.length ? String(cm.takes.length) : '' }
+    ];
+    var tabs = tabDefs.map(function (t) {
+      var on = s.tab === t.id;
+      return { label: t.label, count: t.count, on: on, bg: on ? T.sel : 'transparent', fg: on ? T.text : T.muted, border: on ? T.line5 : T.line, pick: function () { self.setState({ tab: t.id, playing: false }); } };
+    });
+    var qIdx = s.queue.indexOf(curRaw.id);
+    var qDone = s.queue.filter(function (id) { var f = self.item(id); return f && f.kind === 'done'; }).length;
+    var elapsedSec = s.startedAt ? Math.floor((Date.now() - s.startedAt) / 1000) : 0;
+    var mm = Math.floor(elapsedSec / 60), ss = elapsedSec % 60;
+
+    var RD = [
+      { id: 'again', label: 'Again', hint: 'Fell apart', tip: 'It fell apart. It comes back soon.' },
+      { id: 'hard', label: 'Hard', hint: 'Slow or sloppy', tip: 'Got through it, but slow or with mistakes.' },
+      { id: 'good', label: 'Good', hint: 'Clean at target', tip: 'Played it clean at your target tempo.' },
+      { id: 'easy', label: 'Easy', hint: 'Effortless', tip: 'Clean and effortless, at or above tempo.' }
+    ];
+    var shown = simple ? [RD[0], RD[2]] : RD;
+    var ratings = shown.map(function (r, i) {
+      return { label: r.label, hint: r.hint, tip: r.tip, key: String(i + 1), color: RC[r.id], border: RB[r.id], ivl: curRaw.next[r.id], rate: function () { self.rate(r.id); } };
+    });
+
+    // ---- summary + heat
+    var mix = this.mixCounts(s.sessionLog);
+    var total = s.sessionLog.length || 1;
+    var order = ['again', 'hard', 'good', 'easy'];
+    var mixSegs = order.filter(function (k) { return mix[k] > 0; }).map(function (k) { return { w: (mix[k] / total * 100) + '%', bg: RC[k] }; });
+    var mixLegend = order.map(function (k) { return { text: mix[k] + ' ' + self.capWord(k), color: RC[k] }; });
+    var pat = [0, 1, 2, 0, 3, 1, 0, 2, 2, 1, 0, 0, 3, 2, 1];
+    var recent = [2, 3, 1, 2, 3, 2, 3, 1];
+    var levels = [T.track, T.heat1, T.heat2, accent];
+    var heat = [];
+    for (var i = 0; i < 84; i++) {
+      var lv = i === 83 ? (anyDone ? 3 : 0) : i >= 75 ? recent[i - 75] : i === 74 ? 0 : pat[(i * 7 + 3) % 15];
+      heat.push({ bg: levels[lv] });
+    }
+
+    // ---- library
+    var lq = s.libQuery.trim().toLowerCase();
+    var statusOf = function (it) { return it.kind === 'paused' ? 'paused' : it.kind === 'ref' ? 'ref' : 'active'; };
+    var libStatusChip = function (it) {
+      if (it.kind === 'paused') return { t: 'Paused', fg: T.muted, bg: T.track };
+      if (it.kind === 'ref') return { t: 'Reference', fg: T.violet, bg: T.violetTint };
+      if (it.kind === 'new') return { t: 'New', fg: T.good, bg: T.goodTint };
+      if (it.lane === 'warmup' && it.kind !== 'done') return { t: 'Warm-up', fg: T.easy, bg: T.easyTint };
+      if (it.stage === 'Learning') return { t: 'Learning', fg: accent, bg: T.accentTint2 };
+      if (it.stage === 'Mastered') return { t: 'Mastered', fg: T.easy, bg: T.easyTint };
+      return { t: 'Review', fg: T.text, bg: T.sel2 };
+    };
+    var libNext = function (it) {
+      if (it.lane === 'warmup' && it.kind !== 'done') return 'Daily';
+      if (it.kind === 'due') return it.late > 0 ? it.late + 'd overdue' : 'Today';
+      if (it.kind === 'new') return 'Not started';
+      if (it.kind === 'done') return 'Done · ' + it.nextLabel;
+      if (it.kind === 'later') return it.nextLabel;
+      return '—';
+    };
+    var inInst = s.items.filter(inF);
+    var inStatus = inInst.filter(function (it) { return s.libStatus === 'all' || statusOf(it) === s.libStatus; });
+    var areaMatch = function (it) { return s.libArea === 'all' || (s.libArea === 'none' ? !it.areaId : it.areaId === s.libArea); };
+    var libRows = inStatus.filter(areaMatch).filter(function (it) {
+      var ar = self.areaById(it.areaId);
+      return !lq || (it.title + ' ' + it.artist + ' ' + (ar ? ar.name : '') + ' ' + it.tags.join(' ')).toLowerCase().indexOf(lq) >= 0;
+    }).map(function (it) {
+      var d = deco(it);
+      var st = libStatusChip(it);
+      return Object.assign(d, { stLabel: st.t, stFg: st.fg, stBg: st.bg, nextText: libNext(it), bpmCol: it.target ? (it.best || '—') + ' / ' + it.target : '—', artistLine: it.artist || ' ', areaCol: d.hasArea ? d.areaName : '—', areaColFg: d.hasArea ? T.muted : T.faint });
+    });
+    // Area filter: counts follow the instrument and status filters.
+    var sortedAreas = s.areas.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
+    var areaCount = function (id) { return inStatus.filter(function (it) { return it.areaId === id; }).length; };
+    var libAreaOpts = [
+      { id: 'all', label: 'All areas', count: inStatus.length, color: 'transparent' },
+      { id: 'none', label: 'No area', count: inStatus.filter(function (it) { return !it.areaId; }).length, color: T.disabled }
+    ].concat(sortedAreas.map(function (a) { return { id: a.id, label: a.name, count: areaCount(a.id), color: self.dc(a.color) }; })).map(function (o) {
+      var on = s.libArea === o.id;
+      return { label: o.label, count: String(o.count), color: o.color, on: on, bg: on ? T.sel : 'transparent', fg: o.count || o.id === 'all' ? T.text : T.muted, countFg: on ? T.muted : T.faint, pick: function () { self.setState({ libArea: o.id, libAreaOpen: false }); } };
+    });
+    var libAreaSel = s.libArea === 'all' ? 'All' : s.libArea === 'none' ? 'No area' : ((this.areaById(s.libArea) || {}).name || 'All');
+    var libStatuses = [['active', 'Active'], ['paused', 'Paused'], ['ref', 'Reference'], ['all', 'All']].map(function (x) {
+      var on = s.libStatus === x[0];
+      var count = x[0] === 'all' ? inInst.length : inInst.filter(function (it) { return statusOf(it) === x[0]; }).length;
+      return { label: x[1], count: count, on: on, bg: on ? T.sel3 : 'transparent', fg: on ? T.text : T.muted, pick: function () { self.setState({ libStatus: x[0] }); } };
+    });
+
+    // ---- notes
+    var notes = this.notesData();
+    var sel = notes.find(function (n) { return n.id === s.noteSel; }) || notes[0];
+    var noteList = notes.map(function (n) {
+      var on = n.id === sel.id;
+      return { title: n.title, tag: n.tag, edited: n.edited, on: on, bg: on ? T.raised : 'transparent', border: on ? T.line5 : T.raised2, pick: function () { self.setState({ noteSel: n.id }); } };
+    });
+    var selNote = {
+      title: sel.title, tag: sel.tag, edited: sel.edited,
+      paras: sel.body.map(function (t) { return { t: t }; }),
+      hasEmbed: !!sel.embed,
+      embedKind: sel.embed ? sel.embed.kind : '', embedTitle: sel.embed ? sel.embed.title : '', embedMeta: sel.embed ? sel.embed.meta : ''
+    };
+    var inserts = ['Checklist', 'Image', 'PDF', 'YouTube', 'Recording', 'Link to item'].map(function (l) {
+      return { label: l, pick: function () { self.flash(l + ' block: drops into the note right here'); } };
+    });
+
+    // ---- log
+    var logRows = s.logs.map(function (l) {
+      var t = l.items || 1;
+      return {
+        date: l.date, sub: l.min + ' min · ' + l.items + ' items', noteText: l.note || 'No note',
+        segs: order.filter(function (k) { return l.mix[k] > 0; }).map(function (k) { return { w: (l.mix[k] / t * 100) + '%', bg: RC[k] }; })
+      };
+    });
+    var weekMin = s.logs.slice(0, 5).reduce(function (a, l) { return a + l.min; }, 0);
+    var weekItems = s.logs.slice(0, 5).reduce(function (a, l) { return a + l.items; }, 0);
+    var logStats = [
+      { label: 'Last 5 sessions', value: Math.floor(weekMin / 60) + 'h ' + (weekMin % 60) + 'm' },
+      { label: 'Items reviewed', value: String(weekItems) },
+      { label: 'Streak', value: streak + ' days' },
+      { label: 'Library', value: s.items.length + ' items' }
+    ];
+
+    // ---- settings
+    var stepper = function (label, desc, value, dec, inc) {
+      return { label: label, desc: desc, value: value, dec: dec, inc: inc, decLabel: 'Lower ' + label.toLowerCase(), incLabel: 'Raise ' + label.toLowerCase() };
+    };
+    var steppers = [
+      stepper('Desired retention', 'How sure you want to be that you still have it. Higher means more reviews.', s.retention + '%',
+        function () { self.setState({ retention: Math.max(80, s.retention - 1) }); }, function () { self.setState({ retention: Math.min(97, s.retention + 1) }); }),
+      stepper('Longest gap', 'Nothing goes longer than this without a check-in, so you never find out on stage.', s.maxIvl + ' days',
+        function () { self.setState({ maxIvl: Math.max(30, s.maxIvl - 10) }); }, function () { self.setState({ maxIvl: Math.min(120, s.maxIvl + 10) }); }),
+      stepper('New items per day', 'Keeps Today from flooding when you capture a lot at once.', String(s.newPerDay),
+        function () { self.setState({ newPerDay: Math.max(1, s.newPerDay - 1) }); }, function () { self.setState({ newPerDay: Math.min(10, s.newPerDay + 1) }); })
+    ];
+    var settingsInst = Object.keys(IM).map(function (k) {
+      var n = s.items.filter(function (it) { return it.inst === k; }).length;
+      return { name: IM[k].name, color: IM[k].color, count: n + (n === 1 ? ' item' : ' items') };
+    });
+    var areaRows = sortedAreas.map(function (a) {
+      var n = s.items.filter(function (it) { return it.areaId === a.id; }).length;
+      var editing = s.editArea === a.id;
+      var ask = s.mergeAsk && s.mergeAsk.src === a.id ? s.mergeAsk : null;
+      var dst = ask ? self.areaById(ask.dst) : null;
+      var moving = ask ? n : 0;
+      return {
+        id: a.id, name: a.name, color: self.dc(a.color),
+        countText: n ? n + (n === 1 ? ' item' : ' items') : 'unused',
+        editing: editing, notEditing: !editing,
+        editText: s.editText,
+        hasErr: editing && !!s.editErr, err: s.editErr,
+        isMergeAsk: !!ask,
+        mergeText: ask && dst ? 'Merge "' + a.name + '" into "' + dst.name + '"? ' + moving + (moving === 1 ? ' item moves.' : ' items move.') : '',
+        bg: s.areaFlash === a.id ? T.accentTint : 'transparent',
+        swatchLabel: 'Change color of ' + a.name,
+        delLabel: 'Delete ' + a.name,
+        renameLabel: 'Rename ' + a.name,
+        swatch: function () { self.cycleColor(a.id); },
+        startEdit: function () { self.startEdit(a.id); },
+        setEdit: function (e) { self.setState({ editText: e.target.value, editErr: '' }); },
+        editKey: function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); self.commitEdit(); }
+          if (e.key === 'Escape') { e.preventDefault(); self.setState({ editArea: null, editErr: '' }); }
+        },
+        commit: function () { self.commitEdit(); },
+        del: function () { self.deleteArea(a.id); },
+        openLib: function () { self.setState({ screen: 'library', libArea: a.id, libStatus: 'all', inst: 'all', libAreaOpen: false }); },
+        mergeYes: function () { self.mergeArea(ask.src, ask.dst); },
+        mergeNo: function () { self.setState({ mergeAsk: null }); }
+      };
+    });
+
+    // ---- appearance (color scheme + light/dark)
+    var curMode = this.modeNow();
+    var curDir = this.paletteNow();
+    var modeSetting = s.modeOverride || this.props.mode || 'system';
+    var bases = this.themeBases();
+    var paletteCards = Object.keys(bases).map(function (k) {
+      var th = self.buildTheme(k, curMode);
+      var on = k === curDir;
+      return {
+        name: bases[k].name, blurb: bases[k].blurb, on: on, badge: on ? 'In use' : '',
+        bg: th.surf2, text: th.text, muted: th.muted, accent: th.accent, line: th.line3, ring: on ? T.accent : T.line3,
+        sw: [th.bg, th.surf2, th.text, th.accent, th.good, th.again].map(function (c) { return { c: c }; }),
+        pick: function () { self.setState({ paletteOverride: k }); }
+      };
+    });
+    var modeBtns = [['system', 'System'], ['dark', 'Dark'], ['light', 'Light']].map(function (m) {
+      var on = modeSetting === m[0];
+      return { label: m[0] === 'system' ? 'System (' + (self.sysDark === false ? 'light' : 'dark') + ')' : m[1], on: on, bg: on ? T.sel3 : 'transparent', fg: on ? T.text : T.muted, pick: function () { self.setState({ modeOverride: m[0] }); } };
+    });
+
+    // ---- area picker (shared by Capture and the practice card; only one is open at a time)
+    var pkCtx = s.capture ? 'capture' : (s.screen === 'practice' && s.cardPicker ? 'card' : null);
+    var pkSel = pkCtx === 'capture' ? s.form.areaId : pkCtx === 'card' ? curRaw.areaId : null;
+    var pkIds = pkCtx === 'capture' ? s.capChips : pkCtx === 'card' ? s.cardChips : [];
+    var pkChips = pkIds.map(function (id) { return self.areaById(id); }).filter(Boolean).map(function (a) {
+      var on = a.id === pkSel;
+      return { label: a.name, color: self.dc(a.color), on: on, bg: on ? T.sel2 : 'transparent', border: on ? self.dc(a.color) : T.line4, borderStyle: 'solid', fg: on ? T.text : T.muted, pick: function () { self.pickChip(pkCtx, a.id); } };
+    });
+    if (pkCtx === 'capture' && s.form.pendingArea) {
+      pkChips.unshift({ label: s.form.pendingArea + ' · new', color: T.faint, on: true, bg: T.sel2, border: T.faint, borderStyle: 'dashed', fg: T.text, pick: function () { self.setForm({ pendingArea: null }); } });
+    }
+    var pkMatch = this.matchRows(s.pk.text);
+    var pkHi = this.pickerHi(pkMatch);
+    var pkListId = pkCtx === 'card' ? 'card-area-sugg' : 'cap-area-sugg';
+    var pkOpen = !!s.pk.text.trim();
+    var pk = {
+      chips: pkChips,
+      text: s.pk.text,
+      open: pkOpen,
+      listId: pkListId,
+      activeId: pkOpen && pkHi >= 0 ? pkListId + '-' + pkHi : null,
+      rows: pkMatch.rows.map(function (r, i) {
+        var on = i === pkHi;
+        return { id: pkListId + '-' + i, label: r.label, hint: r.hint, color: r.color, on: on, bg: on ? T.sel2 : 'transparent', ring: on ? 'inset 3px 0 0 ' + accent : 'none', hintFg: on ? T.muted : T.faint, pick: function () { self.applyRow(pkCtx, r); } };
+      }),
+      hasNote: !!pkMatch.note, note: pkMatch.note,
+      setText: function (e) { self.setState({ pk: { text: e.target.value, hi: -1 } }); },
+      onKey: function (e) { self.pickerKey(pkCtx, e); }
+    };
+
+    // ---- lanes (Regular / Focus / Warm-up)
+    var LANES = [
+      { id: 'normal', label: 'Regular', hint: "Comes back right before you'd forget it, further apart each time you nail it" },
+      { id: 'focus', label: 'Focus', hint: "Comes first whenever it's due. Keep it to 3–5" },
+      { id: 'warmup', label: 'Warm-up', hint: 'Every day, before everything else' }
+    ];
+    var laneBtns = function (current, set) {
+      return LANES.map(function (l) {
+        var on = current === l.id;
+        return { label: l.label, tip: l.hint, on: on, bg: on ? T.sel3 : 'transparent', fg: on ? (l.id === 'normal' ? T.text : accent) : T.muted, pick: function () { set(l.id); } };
+      });
+    };
+    var f = s.form;
+    var capLanes = laneBtns(f.lane, function (id) { self.setForm({ lane: id }); });
+    var cardLanes = laneBtns(curRaw.lane, function (id) { self.setLane(curRaw.id, id); });
+    var laneHint = (LANES.find(function (l) { return l.id === f.lane; }) || LANES[0]).hint;
+
+    // ---- capture
+    var capInsts = Object.keys(IM).map(function (k) {
+      var on = f.inst === k;
+      return { name: IM[k].name, color: IM[k].color, on: on, bg: on ? T.sel2 : 'transparent', border: on ? IM[k].color : T.line4, fg: on ? T.text : T.muted, pick: function () { self.pickInst(k); } };
+    });
+    var det = this.detect(f.link);
+    var capDisabled = !f.name.trim();
+
+    // ---- Notion import preview (M3): map each Notion Area value against the current areas
+    var notionVals = ['Repertoire', 'Chords', 'Scales', 'Licks', 'Warm-Up', 'Transcription', 'Jam', 'Fretboard', 'Songwriting', 'Ear Training', 'Techniques'];
+    var nMatch = 0, nFold = 0, nWarm = 0, nNew = 0;
+    var notionRows = notionVals.map(function (v) {
+      var k = self.nameKey(v);
+      if (self.isWarmKey(k)) { nWarm++; return { from: v, to: 'Warm-up setting', how: 'Daily, not an area', color: accent }; }
+      var a = s.areas.find(function (x) { return x.nameKey === k; });
+      if (a && a.name === v) { nMatch++; return { from: v, to: a.name, how: 'Exact match', color: self.dc(a.color) }; }
+      if (a) { nFold++; return { from: v, to: a.name, how: 'Same name', color: self.dc(a.color) }; }
+      nNew++;
+      return { from: v, to: 'Create "' + v + '"', how: 'New area', color: T.disabled };
+    });
+    var notionSummary = nMatch + ' match exactly · ' + nFold + ' same name, different spelling · ' + nWarm + ' becomes the Warm-up setting · ' + nNew + (nNew === 1 ? ' new area' : ' new areas');
+    var notionInsts = Object.keys(IM).map(function (k) {
+      var on = s.notionInst === k;
+      return { name: IM[k].name, color: IM[k].color, on: on, bg: on ? T.sel2 : 'transparent', border: on ? IM[k].color : T.line4, fg: on ? T.text : T.muted, pick: function () { self.setState({ notionInst: k }); } };
+    });
+
+    return {
+      t: T,
+      accent: accent,
+      paletteCards: paletteCards,
+      modeBtns: modeBtns,
+      nav: { today: navItem('today'), library: navItem('library'), notes: navItem('notes'), log: navItem('log'), settings: navItem('settings') },
+      todayCount: String(everything.length),
+      libTotal: String(s.items.length),
+      instList: instList,
+      openCapture: function () { self.openCapture(); },
+
+      isToday: s.screen === 'today',
+      streak: streak,
+      budgets: budgets,
+      startSession: function () { self.startSession(); },
+      queueEmpty: keptIds.length === 0,
+      startOpacity: keptIds.length ? 1 : 0.4,
+      hasWarm: warm.length > 0, warm: warm,
+      hasFocus: focus.length > 0, focus: focus,
+      hasDue: due.length > 0, due: due,
+      hasFresh: fresh.length > 0, fresh: fresh,
+      newHeader: 'New · ' + q.fresh.length + ' of ' + s.newPerDay + ' today',
+      hasWaiting: q.waiting > 0,
+      waitingText: q.waiting + ' more new ' + (q.waiting === 1 ? 'item waits' : 'items wait') + ' for tomorrow. Daily cap: ' + s.newPerDay + ' (Settings).',
+      hasCut: q.cut > 0,
+      cutText: q.cut + ' more ' + (q.cut === 1 ? 'item is' : 'items are') + ' due but over your ' + budgetMin + '-minute budget. They stay due and come first next time.',
+      hasDone: done.length > 0, done: done,
+      doneHeader: 'Done today · ' + done.length,
+      showDone: s.showDone,
+      doneToggleLabel: s.showDone ? 'Hide' : 'Show',
+      toggleDone: function () { self.setState({ showDone: !s.showDone }); },
+
+      isPractice: s.screen === 'practice',
+      practiceKey: function (e) { self.practiceKey(e); },
+      goToday: function () { self.go('today'); },
+      endSession: function () { self.endSession(); },
+      cur: cur,
+      cardLanes: cardLanes,
+      cardPickerOpen: s.cardPicker && s.screen === 'practice' && !s.capture,
+      toggleCardPicker: function () { self.openCardPicker(); },
+      clearCardArea: function () { self.setItemArea(curRaw.id, null); self.closeCardPicker(); },
+      pickRef: this.pickRef,
+      areaBtnRef: this.areaBtnRef,
+      elapsed: (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss,
+      posText: qIdx >= 0 ? (qIdx + 1) + ' of ' + s.queue.length : 'Single item',
+      progress: s.queue.length ? Math.round(qDone / s.queue.length * 100) + '%' : '0%',
+      tabs: tabs,
+      tabVideo: s.tab === 'video' && !!cm.video,
+      tabPdf: s.tab === 'pdf' && !!cm.pdf,
+      tabImages: s.tab === 'images',
+      tabTakes: s.tab === 'takes',
+      tabEmpty: (s.tab === 'video' && !cm.video) || (s.tab === 'pdf' && !cm.pdf),
+      emptyTitle: s.tab === 'video' ? 'No video yet' : 'No PDF yet',
+      emptyText: s.tab === 'video' ? 'Paste a YouTube link. It embeds right here with A–B loop and speed control.' : 'Drop a tab, chart or sheet-music PDF. It reopens on the page you left off.',
+      playing: s.playing, notPlaying: !s.playing,
+      playLabel: s.playing ? 'Pause video' : 'Play video',
+      togglePlay: function () { self.setState({ playing: !s.playing }); },
+      speed: s.speed,
+      speeds: [50, 60, 75, 85, 100].map(function (v) {
+        var on = s.speed === v;
+        return { label: v + '%', on: on, bg: on ? accent : T.raised2, fg: on ? T.onAccent : T.text, pick: function () { self.setState({ speed: v }); } };
+      }),
+      loop: s.loop,
+      loopText: s.loop ? 'on' : 'off',
+      loopFill: s.loop ? accent : T.line6,
+      loopBorder: s.loop ? accent : T.line4,
+      loopFg: s.loop ? accent : T.muted,
+      toggleLoop: function () { self.setState({ loop: !s.loop }); },
+      setA: function () { self.flash('Loop start set at the playhead'); },
+      setB: function () { self.flash('Loop end set at the playhead'); },
+      pdfPage: s.pdfPage,
+      pdfPrev: function () { self.setState({ pdfPage: Math.max(1, s.pdfPage - 1) }); },
+      pdfNext: function () { self.setState({ pdfPage: Math.min(cm.pages, s.pdfPage + 1) }); },
+      staves: [{ k: 1 }, { k: 2 }, { k: 3 }],
+      pasteImage: function () { self.flash('Paste with ⌘V. The screenshot attaches to this item.'); },
+      recLabel: s.rec ? 'Recording… click to stop' : 'Record a take',
+      toggleRec: function () {
+        if (s.rec) self.flash('Take saved to this item');
+        self.setState({ rec: !s.rec });
+      },
+      playTake: function () { self.flash('Playing take'); },
+      bpm: s.bpm,
+      beats: [0, 1, 2, 3].map(function (i) {
+        var hit = s.metroOn && s.beat === i;
+        return { bg: hit ? (i === 0 ? accent : T.text) : (i === 0 ? T.heat1 : T.line3) };
+      }),
+      nudgeM5: function () { self.setBpmVal(s.bpm - 5); },
+      nudgeM1: function () { self.setBpmVal(s.bpm - 1); },
+      nudgeP1: function () { self.setBpmVal(s.bpm + 1); },
+      nudgeP5: function () { self.setBpmVal(s.bpm + 5); },
+      tap: function () { self.tap(); },
+      toggleMetro: function () { self.toggleMetro(); },
+      metroLabel: s.metroOn ? 'Stop' : 'Start',
+      metroBg: s.metroOn ? T.text : accent,
+      metroFg: T.onAccent,
+      targetLabel: curRaw.target ? 'Jump to target ' + curRaw.target : 'No target',
+      setTarget: function () { if (curRaw.target) self.setBpmVal(curRaw.target); },
+      clean: s.clean,
+      cleanPh: String(s.bpm),
+      setClean: function (e) { self.setState({ clean: e.target.value }); },
+      ratings: ratings,
+      keyHint: simple ? 'Keys: 1 Again · 2 Good · L loop' : 'Keys: 1–4 rate · L loop',
+      setItemNote: function (e) { self.setItemNote(curRaw.id, e.target.value); },
+      noteSaved: s.noteSavedFor === curRaw.id ? 'Saved' : '',
+      skip: function () { self.skip(); },
+
+      isLibrary: s.screen === 'library',
+      libQuery: s.libQuery,
+      setLibQuery: function (e) { self.setState({ libQuery: e.target.value }); },
+      libStatuses: libStatuses,
+      libRows: libRows,
+      libEmpty: libRows.length === 0,
+      libAreaSel: libAreaSel,
+      libAreaOpen: s.libAreaOpen,
+      libAreaOpts: libAreaOpts,
+      toggleLibArea: function () { self.setState({ libAreaOpen: !s.libAreaOpen }); },
+      manageAreas: function () { self.setState({ screen: 'settings', libAreaOpen: false }); },
+
+      isNotes: s.screen === 'notes',
+      noteList: noteList,
+      selNote: selNote,
+      inserts: inserts,
+      newNote: function () { self.flash('New note: type, paste images, drop PDFs, embed YouTube'); },
+
+      isLog: s.screen === 'log',
+      logStats: logStats,
+      heat: heat,
+      logRows: logRows,
+
+      isSettings: s.screen === 'settings',
+      simple: simple,
+      isFour: !simple,
+      setFour: function () { self.setState({ simple: false }); },
+      setSimple: function () { self.setState({ simple: true }); },
+      fourBg: simple ? 'transparent' : T.sel3, fourFg: simple ? T.muted : T.text,
+      simpleBg: simple ? T.sel3 : 'transparent', simpleFg: simple ? T.text : T.muted,
+      steppers: steppers,
+      settingsInst: settingsInst,
+      instRef: this.instRef,
+      instDraftText: s.instDraft ? s.instDraft.text : '',
+      instAddCap: !!(s.instDraft && s.instDraft.where === 'capture'),
+      instAddCapBtn: !(s.instDraft && s.instDraft.where === 'capture'),
+      instAddSet: !!(s.instDraft && s.instDraft.where === 'settings'),
+      instAddSetBtn: !(s.instDraft && s.instDraft.where === 'settings'),
+      startInstCap: function () { self._instEl = null; self.setState({ instDraft: { where: 'capture', text: '' } }); },
+      startInstSet: function () { self._instEl = null; self.setState({ instDraft: { where: 'settings', text: '' } }); },
+      setInstDraft: function (e) { self.setState({ instDraft: Object.assign({}, s.instDraft, { text: e.target.value }) }); },
+      instDraftKey: function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); self.commitInstDraft(); }
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); self.setState({ instDraft: null }); }
+      },
+      instDraftBlur: function () { if (self.state.instDraft) self.commitInstDraft(); },
+      areaRows: areaRows,
+      renamedRef: this.renamedRef,
+      mergeRef: this.mergeRef,
+      undoRef: this.undoRef,
+      areaCountLine: s.areas.length + (s.areas.length === 1 ? ' area' : ' areas') + ' · ' + s.items.filter(function (it) { return !it.areaId; }).length + ' items with no area',
+      editRef: this.editRef,
+      newAreaText: s.newAreaText,
+      setNewArea: function (e) { self.setState({ newAreaText: e.target.value, areaFlash: null }); },
+      newAreaKey: function (e) { if (e.key === 'Enter') { e.preventDefault(); self.addAreaFromSettings(); } },
+      addAreaBtn: function () { self.addAreaFromSettings(); },
+      exportBackup: function () { self.setState({ lastBackup: 'just now' }); self.flash('Saved sustain-backup-2026-10-06.sustain'); },
+      importBackup: function () { self.flash('Pick a .sustain file to restore'); },
+      importNotion: function () { self.setState({ notionOpen: true }); },
+      showNotion: s.notionOpen,
+      closeNotion: function () { self.setState({ notionOpen: false }); },
+      notionKey: function (e) { if (e.key === 'Escape') self.setState({ notionOpen: false }); },
+      notionRows: notionRows,
+      notionSummary: notionSummary,
+      notionInsts: notionInsts,
+      runNotion: function () { self.setState({ notionOpen: false }); self.flash('Import runs in M3. This preview is exactly what it would do.'); },
+      autoBackup: s.autoBackup,
+      toggleAuto: function () { self.setState({ autoBackup: !s.autoBackup }); },
+      autoBg: s.autoBackup ? accent : T.line5,
+      autoKnob: s.autoBackup ? '24px' : '4px',
+      lastBackup: s.lastBackup,
+
+      showCapture: s.capture,
+      closeCapture: function () { self.setState({ capture: false }); },
+      // The area box handles its own Enter/Esc while it has text; empty-box keys bubble up to here.
+      capKey: function (e) {
+        if (e.key === 'Escape') { self.setState({ capture: false, pk: self.blankPk() }); return; }
+        if (e.key === 'Enter' && e.target && (e.target.tagName === 'INPUT' || e.target === e.currentTarget)) { e.preventDefault(); self.addItem(false, e.shiftKey); }
+      },
+      keepFocus: function (e) { e.preventDefault(); },
+      form: f,
+      nameRef: this.nameRef,
+      setName: function (e) { self.setForm({ name: e.target.value }); },
+      setBpm: function (e) { self.setForm({ bpm: e.target.value }); },
+      setLink: function (e) { self.setForm({ link: e.target.value }); },
+      capInsts: capInsts,
+      pk: pk,
+      capLanes: capLanes,
+      laneHint: laneHint,
+      capFooter: f.lane === 'warmup' ? 'Shows up in Today under Warm-up' : 'Shows up in Today under New',
+      hasDetect: !!det,
+      detectText: det === 'youtube' ? 'YouTube video found. It embeds with A–B loop and speed control.' : det === 'pdf' ? 'PDF found. It opens in the built-in viewer.' : 'Link saved to this item.',
+      setCapNote: function (e) { self.setForm({ noteText: e.target.value }); },
+      capPaste: function (e) { self.capPaste(e); },
+      capDrop: function (e) { self.capDrop(e); },
+      capDragOver: function (e) { e.preventDefault(); },
+      addMockShot: function () { self.addMockAttachment('image'); },
+      addMockFile: function () { self.addMockAttachment('pdf'); },
+      capHasAtt: (f.attachments || []).length > 0,
+      capAtts: (f.attachments || []).map(function (a) {
+        return { name: a.name, url: a.url || '', hasUrl: !!a.url, noUrl: !a.url, kindLabel: { image: 'IMAGE', pdf: 'PDF', audio: 'AUDIO', file: 'FILE' }[a.kind] || 'FILE', removeLabel: 'Remove ' + a.name, remove: function () { self.removeAttachment(a.id); } };
+      }),
+      capDisabled: capDisabled,
+      capOpacity: capDisabled ? 0.45 : 1,
+      addOnly: function () { self.addItem(false); },
+      addPractice: function () { self.addItem(true); },
+
+      showSummary: s.summary,
+      sumMin: this.sessionMins() + ' min',
+      sumItems: String(s.sessionLog.length),
+      mixSegs: mixSegs,
+      mixLegend: mixLegend,
+      note: s.note,
+      setNote: function (e) { self.setState({ note: e.target.value }); },
+      saveSession: function () { self.saveSession(); },
+      closeSummary: function () { self.setState({ summary: false, screen: 'today' }); },
+
+      hasToast: !!s.toast,
+      toast: s.toast,
+      toastUndo: s.toastUndo,
+      undoArea: function () { self.undoArea(); },
+      toastHold: function () { self.toastHold(); },
+      toastResume: function () { self.toastResume(); }
+    };
+  }
+}
+</script>
+</body>
+</html>
