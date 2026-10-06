@@ -1,0 +1,40 @@
+name: App
+# The macOS app: generate the project with XcodeGen, build, run unit tests.
+on:
+  push:
+    paths:
+      - "App/**"
+      - "AppTests/**"
+      - "project.yml"
+      - "Packages/SustainCore/Sources/**"
+      - "Packages/SustainCore/Package.swift"
+      - ".github/workflows/app.yml"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          sw_vers
+      - name: Generate project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+      - name: Build and test
+        run: |
+          xcodebuild test \
+            -project Sustain.xcodeproj \
+            -scheme Sustain \
+            -destination 'platform=macOS' \
+            -derivedDataPath build \
+            -quiet

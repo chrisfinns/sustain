@@ -1,0 +1,25 @@
+name: Core
+# SustainCore is Foundation-only, so it builds and tests on Linux.
+on:
+  push:
+    paths:
+      - "Packages/SustainCore/**"
+      - ".github/workflows/core.yml"
+  pull_request:
+    paths:
+      - "Packages/SustainCore/**"
+  workflow_dispatch:
+
+concurrency:
+  group: core-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    container: swift:6.2-noble
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift --version
+      - run: swift test --package-path Packages/SustainCore

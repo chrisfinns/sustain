@@ -1,0 +1,70 @@
+# XcodeGen spec. Generate the project with `xcodegen generate` (the .xcodeproj is gitignored).
+name: Sustain
+options:
+  bundleIdPrefix: com.chrisfinns
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    DEAD_CODE_STRIPPING: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    # Runs locally without an Apple Developer account (ad-hoc signature).
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+packages:
+  SustainCore:
+    path: Packages/SustainCore
+targets:
+  Sustain:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+    dependencies:
+      - package: SustainCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.chrisfinns.sustain
+        PRODUCT_NAME: Sustain
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Sustain
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.music
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        CODE_SIGN_ENTITLEMENTS: App/Sustain.entitlements
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        ENABLE_PREVIEWS: YES
+      configs:
+        Debug:
+          ENABLE_HARDENED_RUNTIME: NO
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
+  SustainTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: AppTests
+    dependencies:
+      - target: Sustain
+      - package: SustainCore
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.chrisfinns.sustain.tests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Sustain.app/Contents/MacOS/Sustain"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  Sustain:
+    build:
+      targets:
+        Sustain: all
+        SustainTests: [test]
+    test:
+      targets:
+        - SustainTests

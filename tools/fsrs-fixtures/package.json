@@ -1,0 +1,8 @@
+{
+  "name": "sustain-fsrs-fixtures",
+  "private": true,
+  "type": "module",
+  "description": "Generates FSRS golden cases with ts-fsrs for the Swift scheduler tests",
+  "scripts": { "gen": "node gen.mjs" },
+  "dependencies": { "ts-fsrs": "5.4.2" }
+}

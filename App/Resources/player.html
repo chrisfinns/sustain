@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; height: 100%; background: #0B0B0D; overflow: hidden; }
+  #player { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div id="player"></div>
+<script>
+  // Sustain's YouTube bridge. Swift fills in __VIDEO_ID__ and __START__, calls window.sustain.*,
+  // and receives messages on window.webkit.messageHandlers.sustain. The A–B loop runs here, not in Swift.
+  var player = null;
+  var loop = { a: null, b: null, on: false };
+  var lastTimePost = 0;
+
+  function post(type, body) {
+    var msg = Object.assign({ type: type }, body || {});
+    try { window.webkit.messageHandlers.sustain.postMessage(msg); } catch (e) {}
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('player', {
+      host: 'https://www.youtube-nocookie.com',
+      videoId: '__VIDEO_ID__',
+      playerVars: {
+        playsinline: 1, rel: 0, modestbranding: 1, start: __START__,
+        origin: window.location.origin, widget_referrer: window.location.href
+      },
+      events: {
+        onReady: function () {
+          post('ready', { rates: player.getAvailablePlaybackRates(), duration: player.getDuration(), rate: player.getPlaybackRate() });
+        },
+        onStateChange: function (e) { post('state', { state: e.data }); },
+        onPlaybackRateChange: function (e) { post('rate', { rate: e.data }); },
+        onError: function (e) { post('error', { code: e.data }); }
+      }
+    });
+    setInterval(tick, 50);
+  };
+
+  function tick() {
+    if (!player || !player.getCurrentTime) return;
+    var t = player.getCurrentTime();
+    if (loop.on && loop.a != null && loop.b != null && loop.b > loop.a && t >= loop.b) {
+      post('loopWrap', { overshoot: t - loop.b });
+      player.seekTo(loop.a, true);
+    }
+    var now = Date.now();
+    if (now - lastTimePost > 250) {
+      lastTimePost = now;
+      post('time', { t: t, duration: player.getDuration ? player.getDuration() : 0 });
+    }
+  }
+
+  window.onerror = function (msg) { post('jsError', { message: String(msg) }); };
+
+  window.sustain = {
+    play: function () { player && player.playVideo(); },
+    pause: function () { player && player.pauseVideo(); },
+    seek: function (t) { player && player.seekTo(t, true); },
+    setRate: function (r) {
+      if (!player) return;
+      player.setPlaybackRate(r);
+      setTimeout(function () { post('rateSet', { asked: r, got: player.getPlaybackRate() }); }, 500);
+    },
+    setLoop: function (a, b, on) { loop = { a: a, b: b, on: on }; },
+    mark: function (which) { if (player) post('mark', { which: which, t: player.getCurrentTime() }); }
+  };
+
+  var tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  tag.onerror = function () { post('offline', {}); };
+  document.head.appendChild(tag);
+</script>
+</body>
+</html>
