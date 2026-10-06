@@ -13,7 +13,31 @@ Decisions made:
 
 Repo: `chrisfinns/sustain`, branch `claude/gallant-gauss-7axdni`. So far it only has `docs/PLAN.md`. The mockup is at https://claude.ai/artifact/TSe1AHctNW6q3tCF7dqDYC (source in the scratchpad at `sustain-canvas/project/Main.dc.html`).
 
-## Revision 3 (now): lock in Paper & Ink ("soft clay")
+## Revision 5 (done Oct 6): canvas comment round, simplifying v1
+Chris left 8 comments on the canvas. Decisions, now applied to the mockup:
+- **Today:** removed the "N to practice · about N min" line. The streak chip stays.
+- **Practice card:**
+  - Notes are one **freeform text** per item (TipTap doc in the real app; `/` inserts image, PDF, YouTube or recording). They save as you type.
+  - **No metronome in v1.**
+  - **No tempo tracking in v1:** no "clean at" BPM, no best/target BPM, no BPM on Today rows, in Library or in Capture.
+  - **YouTube embed + A–B loop + speed control: keep, and move into M0.**
+- **Capture:**
+  - "+ Instrument" inline, which creates and selects the instrument. Settings › Instruments "+ Add instrument" works too. A custom instrument gets general area suggestions.
+  - The Media box became a freeform **Notes & media** area: free text plus any number of attachments (paste screenshots with Ctrl V, drop PDFs, images or audio, remove with ×). On save, the text goes to the item's notes, images to Images, PDFs to Tab/PDF, audio to Takes.
+  - The lane control is now labeled "Schedule", with plain hints: Regular = "comes back right before you'd forget it…".
+  - Open question to Chris: hide Schedule behind "More options" (Regular by default)?
+
+## Revision 4: canvas comment "remove" on Today's summary line
+A canvas comment from Chris on 1 · Today, anchored to the text `{{ summaryLine }}` (the "9 to practice · about 27 min" line under the Today title), says "remove".
+
+1. Load the `ArtifactComments` tool and read thread `116f1a50-b835-4e34-aa91-6a3b83a3a164`. Also reply to any other threads marked as sent to me.
+2. Re-read the live `project/Main.dc.html` (`action: "read"`), since Chris may have edited it, and diff it against the scratchpad copy. If it changed, work on the live copy.
+3. In the Today header, delete the `<span>{{ summaryLine }}</span>`. Keep the streak chip in that row, the Time budget control and the Start session button. Also drop the now-unused `summaryLine` from `renderVals()`.
+4. Re-run the gates (`check.py` with `node --check` and template names, the harness for all start × palette × mode, and the contrast check), then publish only `project/Main.dc.html` to the same URL.
+5. Update the Today wireframe in the plan (remove "12 due - 3 new - ~24 min"), copy it to `docs/PLAN.md`, commit and push.
+6. Reply in the thread with a one-line note: "Removed the '… to practice · about … min' line from Today's header; the streak chip stays." Then resolve the thread. In the session, write one short line.
+
+## Revision 3: lock in Paper & Ink ("soft clay")
 Chris picked **soft clay**, which is the dark half of **Paper & Ink**: ink #1A1917, cream text #EDE6D6, clay accent #E8876D. The light half, paper #F5F1E8 with red clay #A9412A, is used when the computer is in light mode, and mode stays **System**. Chris will make detailed edits directly on the canvas, so **their edits win**: read before every publish and never overwrite them.
 
 Steps:
@@ -122,7 +146,7 @@ Chris asked to see the color directions and chose **both modes, following the sy
 ## Core loop
 1. **Capture (under 30s):** Cmd/Ctrl+K, type a name, press Enter. That's all that's required. The instrument is preselected, the area is optional, and the setting defaults to Regular. Paste a YouTube URL, drop a PDF, or paste a screenshot straight in.
 2. **Today:** Warm-ups, then Focus, then Due (most overdue first), then New (capped). Optional "I have 20 min" budget that trims the list.
-3. **Practice card (desktop split view):** media on the left (YouTube with A-B loop and 50–100% speed, PDF/tab viewer, images), notes on the right, plus a metronome preset to the item's BPM and a record-yourself button. Rate with 1–4.
+3. **Practice card (desktop split view):** media on the left (YouTube with A-B loop and 50–100% speed, PDF/tab viewer, images, recorded takes), freeform notes on the right. Rate with 1–4. No metronome or tempo tracking in v1.
 4. **Auto-logged session:** items rated, minutes, BPMs, and a closing note. This replaces the manual Practice Log page.
 
 ## UI (desktop wireframes)
@@ -132,7 +156,7 @@ Shell: a left sidebar (Today, Library, Notes, Log, Settings, instrument filter, 
 ```
 +--------------+---------------------------------------------------------+
 | SUSTAIN      | Today - Tue Oct 6           [20 min v]  [> Start session]|
-|              | 12 due - 3 new - ~24 min                   9-day streak  |
+|              | 9-day streak                                            |
 | > Today   12 |                                                         |
 |   Library    | WARM-UP                                                 |
 |   Notes      |  o Spider exercise         Guitar - Technique   80 bpm  |
@@ -301,7 +325,8 @@ Shell: a left sidebar (Today, Library, Notes, Log, Settings, instrument filter, 
 ## Data model (Dexie / IndexedDB)
 - `instruments` {id, name, icon, color}, seeded: Guitar, Bass, Piano/Keys, Drums, Voice
 - `areas` 'id, &nameKey': {id ('seed-<slug>' or 'ar_<ulid>'), name (1–32 chars), nameKey, color (one of 8 palette tokens; a new area gets the least-used one), seedKey?, createdAt}
-- `items` {id, title, instrumentId, **areaId (string or null)**, **lane**, paused, reference, targetBpm, bestCleanBpm, artist, key, source, tags[] (import only, read-only), fsrsCard (due, stability, difficulty, reps, lapses, state, last_review), notesDoc (TipTap JSON), createdAt}
+- `instruments` are user-addable (name + color token); a custom instrument gets general area suggestions
+- `items` {id, title, instrumentId, **areaId (string or null)**, **lane**, paused, reference, artist, key, source, tags[] (import only, read-only), fsrsCard (due, stability, difficulty, reps, lapses, state, last_review), notesDoc (TipTap JSON, freeform), createdAt}. No BPM fields in v1; Notion's BPM is ignored on import.
 - `meta` {key, value}: `seededAreas`, `schemaVersion`. Null isn't indexed in IndexedDB, so "No area" is filtered in memory.
 - `attachments` {id, itemId?, noteId?, kind: pdf|image|audio|video|youtube|link, blob?, url?, meta (yt loopA/loopB/speed, pdf lastPage)}
 - `reviews` {id, itemId, sessionId, rating, bpm?, at, fsrsLog}, the source for undo and later FSRS parameter optimization
@@ -314,8 +339,8 @@ Shell: a left sidebar (Today, Library, Notes, Log, Settings, instrument filter, 
 - `ts-fsrs` scheduler
 - TipTap notes with custom nodes for YouTube, PDF, image, and recording
 - `pdfjs-dist` viewer; YouTube IFrame Player API (`seekTo`, `setPlaybackRate`) for A-B loops
-- Web Audio lookahead metronome with tap tempo; MediaRecorder for self-recording
-- Keyboard shortcuts: 1–4 rate, Space play/pause, L loop, M metronome, Cmd+K capture
+- MediaRecorder for self-recording (no metronome in v1)
+- Keyboard shortcuts: 1–4 rate, Space play/pause, L loop, Cmd+K capture
 - **Backup:** export/import a `.sustain` zip (JSON + blobs, via `fflate`). In Chrome/Edge, optional auto-backup to a folder the user picks (File System Access API).
 - Tests: Vitest (domain) + Playwright (e2e, Chromium at /opt/pw-browsers)
 
@@ -333,9 +358,17 @@ src/components/tools/{Metronome,Timer}.tsx
 
 ## Roadmap
 - **Step 0, clickable mockup (first thing after approval):** a single-file HTML prototype of the 5 screens above with fake data, published as a private Artifact. Sign-off on the look before any app code.
-- **M0, usable daily (about 1 week):** scaffold, schema + seeds, scheduler + tests, quick-add (optional area, type-to-create, lane), Settings › Areas (rename, recolor, merge, delete + undo), Library (filter by instrument, area, "No area"), Today, 4-button rating with keys, Done Today, JSON backup export
-- **M1, media + notes:** YouTube loop/speed, PDF viewer, paste/drop images, links, TipTap notes per item
-- **M2, practice tools:** session timer + log, metronome tied to item BPM, BPM progress, calendar heatmap/streak
+- **M0, usable daily (about 1 week):**
+  - scaffold, schema + seeds, scheduler + tests
+  - quick-add (optional area, type-to-create, schedule, add instrument, freeform notes + multiple pasted/dropped attachments)
+  - Settings › Areas (rename, recolor, merge, delete + undo)
+  - Library (filter by instrument, area, "No area")
+  - Today, 4-button rating with keys, Done Today
+  - **YouTube embed with A–B loop + speed**
+  - JSON backup export
+- **M1, media + notes:** PDF viewer, image gallery, links, TipTap notes with `/` inserts
+- **M2, practice tools:** session timer + log, calendar heatmap/streak
+- **Later, only if wanted:** metronome, tempo tracking (target / best clean BPM, BPM on rows)
 - **M3, data + migration:** recordings, general Notes, full zip backup + folder auto-backup, **Notion CSV import** (Name/Area/Status/BPM/FOCUS/Artist/Key/Source; Interval + Last Practiced seed FSRS stability and due). It shows an area mapping preview first. For your 11 Notion areas: 9 match exactly, Techniques → Technique, Warm-Up → the Warm-up setting, and no new areas are created, PWA offline polish
 - **M4, grow:** Tauri desktop build, shareable "practice pack" files (a teacher or course exports a set of items), FSRS parameter optimizer from review history
 
