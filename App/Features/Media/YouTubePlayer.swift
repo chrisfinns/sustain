@@ -149,7 +149,7 @@ struct YouTubePlayerView: NSViewRepresentable {
         web.configuration.userContentController.removeScriptMessageHandler(forName: "sustain")
     }
 
-    final class Coordinator: NSObject, @preconcurrency WKScriptMessageHandler {
+    final class Coordinator: NSObject, WKScriptMessageHandler {
         var model: YouTubePlayerModel
         private var loaded: String?
 

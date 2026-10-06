@@ -2,7 +2,7 @@ import SwiftUI
 import SustainCore
 
 extension Color {
-    init(_ c: RGBA) {
+    nonisolated init(_ c: RGBA) {
         self.init(.sRGB, red: Double(c.r) / 255, green: Double(c.g) / 255, blue: Double(c.b) / 255, opacity: c.a)
     }
 }

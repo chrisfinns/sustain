@@ -20,6 +20,6 @@ jobs:
     container: swift:6.2-noble
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: swift --version
       - run: swift test --package-path Packages/SustainCore
