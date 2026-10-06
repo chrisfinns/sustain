@@ -211,14 +211,19 @@ struct ToastView: View {
             Text(toast.text).frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityAddTraits(.updatesFrequently)
             if toast.undo != nil {
-                Button("Undo") { app.undoAreaChange() }
-                    .buttonStyle(.plain)
-                    .font(.system(size: 13, weight: .bold))
-                    .padding(.horizontal, 14)
-                    .frame(minHeight: 32)
-                    .foregroundStyle(theme[.text])
-                    .background(theme[.bg], in: RoundedRectangle(cornerRadius: 7))
-                    .keyboardShortcut("z", modifiers: .command)
+                // The whole 32 pt pill is the button, not just the word.
+                Button { app.undoAreaChange() } label: {
+                    Text("Undo")
+                        .font(.system(size: 13, weight: .bold))
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 32)
+                        .foregroundStyle(theme[.text])
+                        .background(theme[.bg], in: RoundedRectangle(cornerRadius: 7))
+                        .contentShape(RoundedRectangle(cornerRadius: 7))
+                }
+                .buttonStyle(.plain)
+                .keyboardShortcut("z", modifiers: .command)
+                .accessibilityLabel("Undo")
             }
         }
         .font(.system(size: 13, weight: .semibold))

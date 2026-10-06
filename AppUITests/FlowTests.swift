@@ -120,6 +120,7 @@ final class FlowTests: XCTestCase {
         trash.click()
         let undo = app.buttons["Undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 3), "Undo toast should appear")
+        undo.hover()
         undo.click()
         XCTAssertTrue(app.buttons["Rename Grooves"].waitForExistence(timeout: 3), "Undo should restore Grooves")
         app.typeKey("1", modifierFlags: .command)
