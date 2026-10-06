@@ -1,6 +1,6 @@
 # Sustain for Mac: Swift build plan
 
-Status: draft, Oct 6 2026. This is the build plan for the native macOS app.
+Status: decisions confirmed by Chris, Oct 6 2026. This is the build plan for the native macOS app.
 
 What it builds on:
 - **UI:** the approved mockup in `design/mockup/Main.dc.html` (canvas: https://claude.ai/artifact/TSe1AHctNW6q3tCF7dqDYC). Layout, copy, states, tokens and keys come from there. When this plan and the mockup disagree, this plan's "Changes from the mockup" section wins.
@@ -13,12 +13,12 @@ This replaces the Delivery, Stack, Structure, Roadmap and Verification sections 
 
 | Topic | Decision |
 |---|---|
-| Platform | macOS 15+, SwiftUI, Swift 6 language mode (strict concurrency), Xcode 26 |
+| Platform | macOS 26+ (Chris's Mac; nobody else runs it before M4), SwiftUI, Swift 6 language mode (strict concurrency), Xcode 26 |
 | Project | XcodeGen `project.yml` (the `.xcodeproj` is generated and gitignored) + a local SwiftPM package `SustainCore` |
 | Persistence | SwiftData with a `VersionedSchema` from day one. Store in the app's sandbox container (Application Support) |
 | Media files | Real files in `Application Support/Sustain/Media/<attachmentId>.<ext>`, referenced by file name. Not blobs in the DB, so PDFKit, AVFoundation and Quick Look get URLs |
 | Scheduler | Our own FSRS port inside `SustainCore` (~250 lines, no dependency), proven equal to ts-fsrs 5 by golden fixtures |
-| YouTube | `WKWebView` + YouTube IFrame Player API (youtube-nocookie). The A–B loop runs inside the page; Swift talks to it through `evaluateJavaScript` and a script message handler |
+| YouTube | YouTube IFrame Player API (youtube-nocookie) in SwiftUI's `WebView`/`WebPage` (new in macOS 26), or `WKWebView` in a representable if the spike shows `WebPage` can't receive the page's messages. The A–B loop runs inside the page; Swift calls into it with JavaScript and receives `ready`/`state`/`time` messages |
 | PDF / images / audio | PDFKit `PDFView`; `NSImage` grid + Quick Look; `AVAudioPlayer` / `AVAudioRecorder` |
 | Zip (backups) | ZIPFoundation, the only third-party dependency (works on Linux too, so backup tests run in Core) |
 | Tests | Swift Testing in `SustainCore` (runs on Linux and macOS); XCTest + XCUITest for the app |
@@ -182,7 +182,7 @@ CloudKit-safe from day one, so iCloud sync later is a switch and not a migration
 **Day rollover:** Today rebuilds on `NSCalendarDayChanged`, on wake from sleep and when the app becomes active.
 
 ## Media
-- **YouTube** (`Resources/player.html` in a `WKWebView`):
+- **YouTube** (`Resources/player.html` in the web view the spike picks):
   - **Loop:** inside the page, a 50 ms timer seeks to A whenever the playhead passes B. Loop points are draggable handles on the bar, plus "Set A here" / "Set B here".
   - **Speed:** pills 50/60/75/85/100 %.
   - **Saving:** loop points, loop state and speed save per item.
@@ -199,7 +199,7 @@ CloudKit-safe from day one, so iCloud sync later is a switch and not a migration
 - **Notes `/` insert (M1):**
   - Typing `/` at the start of a line opens an insert menu (Image, PDF, YouTube link, Recording).
   - The chosen media attaches to the item and lands in its tab, and a plain reference line is inserted into the notes.
-  - Rich inline embeds wait for a macOS 26 baseline (rich-text `TextEditor`).
+  - Rich inline embeds (images inside the text) come later with an `NSTextView` wrapper and text attachments. macOS 26's rich-text `TextEditor` handles formatting, not embedded files.
 - **MediaStore:**
   - Copies files in, then writes the Attachment row.
   - Removes the file when its attachment is deleted.
@@ -213,7 +213,7 @@ CloudKit-safe from day one, so iCloud sync later is a switch and not a migration
 
 ## Changes from the mockup (gaps the mockup leaves open)
 1. **Appearance:** only System / Dark / Light. The four palette cards go away because only Paper & Ink ships.
-2. **Fonts:** SF Pro + SF Mono, which is what the mockup actually renders (Main sets `-apple-system` / `SF Mono`). Open question below.
+2. **Fonts:** SF Pro + SF Mono, the same fonts the mockup renders (Main sets `-apple-system` / `SF Mono`). Nothing to bundle.
 3. **Editing an item:** the mockup has no way to rename, pause, mark as reference or delete an item. Add a "⋯" menu in the practice header and a right-click menu on Today and Library rows:
    - Rename…
    - Artist & key…
@@ -228,7 +228,7 @@ CloudKit-safe from day one, so iCloud sync later is a switch and not a migration
 ## Milestones (each ends with something Chris uses)
 
 **M0: daily loop (the app replaces Notion)**
-1. **YouTube spike, first** (biggest risk): embed plays in a sandboxed `WKWebView`, the loop is accurate to ±0.1 s, and we know which speeds YouTube honors.
+1. **YouTube spike, first** (biggest risk): embed plays in a sandboxed SwiftUI `WebView` (or `WKWebView`), the loop is accurate to ±0.1 s, and we know which speeds YouTube honors.
 2. **Scaffold:** `project.yml`, the Core package, both CI workflows, and a themed empty window on macOS.
 3. **Core:** dates, areas (nameKey, matching, ranking, ops), FSRS + scheduler with fixtures, Today queue, lane rules, streak, theme + contrast, YouTube URL. All green on Linux.
 4. **Store:** SchemaV1, Seeder (instruments and 19 areas, once), MediaStore, ItemStore / AreaStore / ReviewStore. App tests green on macOS CI.
@@ -295,15 +295,15 @@ Done when: Chris captures in under 30 s, practices a full Today with keys only, 
   - a light/dark switch while the app is open
 
 ## Risks
-- **YouTube in `WKWebView`:**
+- **YouTube in a web view:**
   - Embeds without a referrer fail (errors 152/153). Load `player.html` with an https `baseURL` and pass `origin` / `widget_referrer`.
   - Not every speed may be honored. If 60 % or 85 % get rounded, show only the rates `getAvailablePlaybackRates()` returns between 50 and 100 %.
   - The step 1 spike settles both before anything else is built.
 - **Writing SwiftUI without a Mac in the loop:** mitigated by the thin app layer, macOS CI on every app PR, and the PNG snapshots.
 - **Arrow and Enter keys in a focused SwiftUI `TextField`** may not reach `.onKeyPress` on macOS. Fallback: a small `NSTextField` wrapper that handles `moveUp`, `moveDown`, `insertNewline` and `cancelOperation` in `doCommandBy`, used only by `AreaPicker` and Capture.
-- **SwiftData quirks on macOS 15:** keep queries simple and filter in memory (a few thousand items at most). All writes go through the Store types, so swapping to GRDB later would touch only `App/Store`.
+- **SwiftData quirks:** keep queries simple and filter in memory (a few thousand items at most). All writes go through the Store types, so swapping to GRDB later would touch only `App/Store`.
 
-## Open questions for Chris
-1. **Fonts:** SF Pro + SF Mono (native, and what the mockup renders), or bundle Instrument Sans + IBM Plex Mono as PLAN.md said? Recommendation: SF.
-2. **Minimum macOS:** 15 (recommended). If your Mac is on macOS 26 and nobody else will run it, targeting 26 gets rich-text notes with inline embeds sooner.
-3. **Schedule control in Capture:** keep it visible, as in the mockup (recommended), or hide it behind "More options"?
+## Decisions (Chris, Oct 6)
+1. **Fonts:** SF Pro + SF Mono, the same fonts the mockup renders.
+2. **Minimum macOS:** 26. Chris is on it and is the only user until M4. If the app is ever shared with people on older Macs, lowering the target means replacing the macOS 26-only APIs, so keep them inside small wrappers.
+3. **Schedule control in Capture:** stays visible, as in the mockup.

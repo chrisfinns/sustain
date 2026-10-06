@@ -27,7 +27,7 @@ Chris left 8 comments on the canvas. Decisions, now applied to the mockup:
   - "+ Instrument" inline, which creates and selects the instrument. Settings › Instruments "+ Add instrument" works too. A custom instrument gets general area suggestions.
   - The Media box became a freeform **Notes & media** area: free text plus any number of attachments (paste screenshots with Ctrl V, drop PDFs, images or audio, remove with ×). On save, the text goes to the item's notes, images to Images, PDFs to Tab/PDF, audio to Takes.
   - The lane control is now labeled "Schedule", with plain hints: Regular = "comes back right before you'd forget it…".
-  - Open question to Chris: hide Schedule behind "More options" (Regular by default)?
+  - Open question to Chris: hide Schedule behind "More options" (Regular by default)? Answered Oct 6: no, it stays visible.
 
 ## Revision 4: canvas comment "remove" on Today's summary line
 A canvas comment from Chris on 1 · Today, anchored to the text `{{ summaryLine }}` (the "9 to practice · about 27 min" line under the Today title), says "remove".
@@ -255,7 +255,7 @@ Shell: a left sidebar (Today, Library, Notes, Log, Settings, instrument filter, 
   - all small text ≥ 4.5:1 on every surface it sits on
   - text on accent ≥ 4.5:1
   - color dots ≥ 3:1
-- **Type:** Instrument Sans for UI, IBM Plex Mono for numbers (BPM, timers, intervals, counts).
+- **Type:** SF Pro for UI, SF Mono for numbers (timers, intervals, counts), the same fonts the mockup renders. Changed Oct 6 from Instrument Sans + IBM Plex Mono.
 - **In the real app:**
   - Tokens become CSS custom properties on `:root`, with dark/light sets switched by `prefers-color-scheme` and a `data-theme` override.
   - Tailwind's theme maps to those variables.
