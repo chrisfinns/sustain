@@ -112,3 +112,27 @@ import Testing
         #expect(LinkDetect.detect("") == nil)
     }
 }
+
+@Suite struct BackupFormatTests {
+    @Test func roundTripsThroughJSON() throws {
+        let t = date("2026-10-06T15:00:00Z")
+        let card = FSRSCard(due: t, stability: 2.3, difficulty: 6.4, elapsedDays: 0, scheduledDays: 2, reps: 1, lapses: 0, state: .review, lastReview: t)
+        let backup = BackupV1(
+            exportedAt: t,
+            settings: .init(retention: 0.9, maxInterval: 60, newPerDay: 3, simple: false, mode: "system"),
+            instruments: [.init(id: "guitar", name: "Guitar", color: .amber, order: 0, createdAt: t)],
+            areas: [.init(id: "ar_slap", name: "Slap", color: .violet, seedKey: nil, createdAt: t)],
+            items: [.init(id: "it_1", title: "Slap groove", instrumentId: "guitar", areaId: nil, lane: .warmup, warmupSince: t,
+                          paused: false, reference: false, artist: "", key: "E", source: "", tags: ["imported"], notes: "Thumb rests",
+                          links: [], youtube: .init(url: "https://youtu.be/dQw4w9WgXcQ", videoId: "dQw4w9WgXcQ", loopA: 42, loopB: nil, loopOn: true, speed: 0.75),
+                          card: card, attachments: [], createdAt: t, updatedAt: t)],
+            reviews: [.init(id: "rv_1", itemId: "it_1", sessionId: nil, rating: .good, at: t, day: "2026-10-06", prevCard: .new(at: t), nextCard: card)],
+            sessions: [.init(id: "ss_1", startedAt: t, endedAt: t, durationSec: 60, note: "")],
+            meta: ["seededAreas": "1"])
+        let data = try BackupV1.encoder().encode(backup)
+        let back = try BackupV1.decoder().decode(BackupV1.self, from: data)
+        #expect(back == backup)
+        #expect(back.items[0].areaId == nil)
+        #expect(back.items[0].lane == .warmup)
+    }
+}

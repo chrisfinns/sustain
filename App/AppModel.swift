@@ -10,6 +10,10 @@ final class AppModel {
     /// Sidebar instrument filter; nil = all.
     var instrumentFilter: String?
     var budget: TimeBudget = .all
+    /// Library filters live here so Settings › Areas can link into them.
+    var libraryStatus: LibraryStatus = .active
+    /// "all", "none", or an area id.
+    var libraryArea = "all"
     var showCapture = false
     /// The instrument Capture last used.
     var lastInstrumentId: String?
@@ -90,6 +94,19 @@ final class AppModel {
 
     func refreshDay() {
         now = .now
+    }
+}
+
+enum LibraryStatus: String, CaseIterable {
+    case active, paused, reference, all
+
+    var label: String {
+        switch self {
+        case .active: "Active"
+        case .paused: "Paused"
+        case .reference: "Reference"
+        case .all: "All"
+        }
     }
 }
 
@@ -231,5 +248,41 @@ extension AppModel {
         }
         save()
         open(item.id, items: items)
+    }
+}
+
+// MARK: - Instruments
+
+extension AppModel {
+    /// Adds an instrument by name, or finds the one with the same name. Returns its id.
+    @discardableResult
+    func addInstrument(_ raw: String) -> String? {
+        let name = AreaNames.cleanName(raw, max: 24)
+        let key = AreaNames.nameKey(name)
+        guard !key.isEmpty else { return nil }
+        let all = instruments()
+        if let existing = all.first(where: { AreaNames.nameKey($0.name) == key }) {
+            flash("\"\(existing.name)\" is already on your list")
+            return existing.id
+        }
+        var id = "in_" + AreaNames.slug(name)
+        if all.contains(where: { $0.id == id }) { id += "-" + String(Int(Date.now.timeIntervalSince1970), radix: 36) }
+        let color = ColorName.leastUsed(all.map(\.color))
+        ctx.insert(Instrument(id: id, name: name, color: color, order: (all.map(\.order).max() ?? 0) + 1, createdAt: .now))
+        save()
+        flash("Added \(name). Areas work across every instrument.")
+        return id
+    }
+}
+
+// MARK: - Sidebar counts
+
+extension AppModel {
+    /// Today's count overall and per instrument, ignoring the budget and the filter.
+    func todayCounts(_ items: [Item]) -> (total: Int, byInstrument: [String: Int]) {
+        let index = practice.todayIndex(now: now)
+        let snaps = items.map { practice.queueItem($0, now: now, today: index[$0.id] ?? []) }
+        let by = TodayQueue.countsByInstrument(items: snaps, now: now, days: days, newPerDay: settings.newPerDay)
+        return (by.values.reduce(0, +), by)
     }
 }

@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import SustainCore
 
@@ -31,41 +32,68 @@ enum Screen: String, CaseIterable, Identifiable {
     }
 }
 
-/// M0 step 2: the themed shell. Screens fill in over the next steps.
+/// The window: sidebar on the left, the current screen on the right, Capture and the toast on top.
 struct ContentView: View {
     @Environment(\.theme) private var theme
-    @State private var screen: Screen = .today
+    @Environment(AppModel.self) private var app
 
     var body: some View {
         HStack(spacing: 0) {
-            Sidebar(screen: $screen)
+            Sidebar()
                 .frame(width: 232)
                 .background(theme[.side])
                 .overlay(alignment: .trailing) {
                     Rectangle().fill(theme[.sideLine]).frame(width: 1)
                 }
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    switch screen {
-                    case .today: TodayPlaceholder()
-                    default:
-                        Text(screen.title).font(Typo.pageTitle).tracking(-0.64)
+                Group {
+                    switch app.screen {
+                    case .today: TodayView().frame(maxWidth: 980, alignment: .leading)
+                    case .practice: PracticeView()
+                    case .library: LibraryView().frame(maxWidth: 1120, alignment: .leading)
+                    case .settings: SettingsView().frame(maxWidth: 860, alignment: .leading)
+                    case .notes: LaterScreen(title: "Notes", text: "General practice notes, lesson notes, gear and resources arrive in a later update.")
+                    case .log: LaterScreen(title: "Practice log", text: "Every session is already saved. The log, heatmap and streak history arrive in the next update.")
                     }
                 }
-                .frame(maxWidth: 980, alignment: .leading)
                 .padding(EdgeInsets(top: 28, leading: 36, bottom: 40, trailing: 36))
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(theme[.bg])
+        }
+        .overlay {
+            if app.showCapture { CaptureView() }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if let toast = app.toast {
+                ToastView(toast: toast).padding(24).transition(.opacity)
+            }
+        }
+        .animation(.easeOut(duration: 0.15), value: app.toast)
+    }
+}
+
+private struct LaterScreen: View {
+    @Environment(\.theme) private var theme
+    let title: String
+    let text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(Typo.pageTitle).tracking(-0.64)
+            Text(text).foregroundStyle(theme[.muted])
         }
     }
 }
 
 private struct Sidebar: View {
     @Environment(\.theme) private var theme
-    @Binding var screen: Screen
+    @Environment(AppModel.self) private var app
+    @Query(sort: \Item.createdAt) private var items: [Item]
+    @Query(sort: \Instrument.order) private var instruments: [Instrument]
 
     var body: some View {
+        let counts = app.todayCounts(items)
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 10) {
                 WaveformMark()
@@ -75,7 +103,7 @@ private struct Sidebar: View {
             }
             .padding(.horizontal, 8)
 
-            Button {} label: {
+            Button { app.showCapture = true } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "plus").font(.system(size: 15, weight: .semibold))
                     Text("Capture").fontWeight(.semibold)
@@ -86,39 +114,38 @@ private struct Sidebar: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .foregroundStyle(theme[.onAccent])
                 .background(theme[.accent], in: RoundedRectangle(cornerRadius: 10))
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
             VStack(spacing: 2) {
                 ForEach(Screen.sidebar) { s in
-                    Button { screen = s } label: {
+                    let on = app.screen == s || (s == .today && app.screen == .practice)
+                    Button { app.screen = s } label: {
                         HStack(spacing: 12) {
                             Image(systemName: s.symbol).frame(width: 18)
                             Text(s.title).fontWeight(.medium)
                             Spacer()
+                            if s == .today { Text("\(counts.total)").font(Typo.mono(12)) }
+                            if s == .library { Text("\(items.count)").font(Typo.mono(12)) }
+                            if s == .settings { Text("⌘,").font(Typo.mono(11)).opacity(0.8) }
                         }
                         .padding(.horizontal, 12)
                         .frame(maxWidth: .infinity, minHeight: 44)
-                        .foregroundStyle(screen == s ? theme[.text] : theme[.muted])
-                        .background(screen == s ? theme[.sel] : .clear, in: RoundedRectangle(cornerRadius: 8))
+                        .foregroundStyle(on ? theme[.text] : theme[.muted])
+                        .background(on ? theme[.sel] : .clear, in: RoundedRectangle(cornerRadius: 8))
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityAddTraits(on ? .isSelected : [])
                 }
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 SectionLabel("Instruments").padding(.horizontal, 12).padding(.bottom, 6)
-                ForEach(seedInstruments) { inst in
-                    HStack(spacing: 12) {
-                        RoundedRectangle(cornerRadius: 3).fill(theme.color(inst.color)).frame(width: 9, height: 9)
-                        Text(inst.name)
-                        Spacer()
-                        Text("0").font(Typo.mono(12))
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(minHeight: 36)
-                    .foregroundStyle(theme[.muted])
+                instrumentRow(id: nil, name: "All", color: theme[.disabled2], count: counts.total)
+                ForEach(instruments) { ins in
+                    instrumentRow(id: ins.id, name: ins.name, color: theme.color(ins.color), count: counts.byInstrument[ins.id] ?? 0)
                 }
             }
             Spacer()
@@ -127,38 +154,23 @@ private struct Sidebar: View {
         .font(Typo.body)
     }
 
-    private struct SidebarInstrument: Identifiable {
-        let id: String
-        let name: String
-        let color: ColorName
-    }
-
-    private var seedInstruments: [SidebarInstrument] {
-        [.init(id: "guitar", name: "Guitar", color: .amber), .init(id: "bass", name: "Bass", color: .violet),
-         .init(id: "piano", name: "Piano", color: .blue), .init(id: "drums", name: "Drums", color: .coral),
-         .init(id: "voice", name: "Voice", color: .teal)]
-    }
-}
-
-private struct TodayPlaceholder: View {
-    @Environment(\.theme) private var theme
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(Typo.meta)
-                .foregroundStyle(theme[.muted])
-            Text("Today").font(Typo.pageTitle).tracking(-0.64)
+    private func instrumentRow(id: String?, name: String, color: Color, count: Int) -> some View {
+        let on = app.instrumentFilter == id
+        return Button { app.instrumentFilter = id } label: {
+            HStack(spacing: 12) {
+                RoundedRectangle(cornerRadius: 3).fill(color).frame(width: 9, height: 9)
+                Text(name)
+                Spacer()
+                Text("\(count)").font(Typo.mono(12))
+            }
+            .padding(.horizontal, 12)
+            .frame(minHeight: 36)
+            .foregroundStyle(on ? theme[.text] : theme[.muted])
+            .background(on ? theme[.raised2] : .clear, in: RoundedRectangle(cornerRadius: 8))
+            .contentShape(Rectangle())
         }
-        VStack(alignment: .leading, spacing: 8) {
-            Text("All caught up.").font(.system(size: 18, weight: .semibold))
-            Text("Nothing else is due today. Capture something new, or come back tomorrow.")
-                .foregroundStyle(theme[.muted])
-        }
-        .padding(28)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(theme[.surf], in: RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(theme[.line]))
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(on ? .isSelected : [])
     }
 }
 

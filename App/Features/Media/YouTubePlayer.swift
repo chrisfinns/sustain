@@ -28,6 +28,8 @@ final class YouTubePlayerModel {
     var loopOvershoots: [Double] = []
     var rateChecks: [RateCheck] = []
     var jsErrors: [String] = []
+    /// Speed to apply once the player is ready (the item's saved speed).
+    var preferredRate: Double = 1
 
     struct RateCheck: Identifiable {
         let id = UUID()
@@ -78,6 +80,7 @@ final class YouTubePlayerModel {
             duration = num("duration") ?? 0
             rate = num("rate") ?? 1
             if loopA != nil || loopB != nil { setLoop(a: loopA, b: loopB, on: loopOn) }
+            if abs(preferredRate - 1) > 0.001 { setRate(preferredRate) }
         case "state":
             state = PlayState(rawValue: Int(num("state") ?? -1)) ?? .unstarted
         case "rate":
