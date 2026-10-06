@@ -42,6 +42,29 @@ jobs:
             -destination 'platform=macOS,arch=arm64' \
             -derivedDataPath build \
             | xcbeautify --renderer github-actions
+      - name: Crash reports
+        if: failure()
+        run: |
+          for f in ~/Library/Logs/DiagnosticReports/Sustain*.ips; do
+            [ -f "$f" ] || continue
+            echo "=== $f"
+            python3 - "$f" <<'PY'
+          import json, sys
+          raw = open(sys.argv[1]).read()
+          head, _, body = raw.partition("\n")
+          d = json.loads(body)
+          ex = d.get("exception", {})
+          print("exception:", ex.get("type"), ex.get("signal"), d.get("termination", {}).get("indicator"))
+          for k in ("asi", "ktriageinfo"):
+              if k in d: print(k, d[k])
+          t = next((t for t in d.get("threads", []) if t.get("triggered")), None)
+          imgs = d.get("usedImages", [])
+          if t:
+              for fr in t.get("frames", [])[:40]:
+                  img = imgs[fr.get("imageIndex", 0)].get("name", "?") if imgs else "?"
+                  print(f"  {img:28} {fr.get('symbol', '?')}")
+          PY
+          done
       - name: Collect screenshots
         if: always()
         run: |

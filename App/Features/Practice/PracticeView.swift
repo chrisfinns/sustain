@@ -241,7 +241,7 @@ struct PracticeView: View {
                     .scrollContentBackground(.hidden)
                     .focused($notesFocused)
                     .padding(8)
-                    .frame(minHeight: 190)
+                    .frame(minHeight: 190, idealHeight: 260, maxHeight: 420)
                     .background(theme[.surf2], in: RoundedRectangle(cornerRadius: 10))
                     .overlay(alignment: .topLeading) {
                         if item.notes.isEmpty {

@@ -164,7 +164,7 @@ struct CaptureView: View {
                 .font(Typo.body)
                 .scrollContentBackground(.hidden)
                 .padding(8)
-                .frame(minHeight: 96)
+                .frame(height: 110)
                 .background(theme[.bg], in: RoundedRectangle(cornerRadius: 8))
                 .overlay(alignment: .topLeading) {
                     if notes.isEmpty {
