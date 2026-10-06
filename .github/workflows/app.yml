@@ -71,9 +71,14 @@ jobs:
         run: |
           mkdir -p screens
           cp ~/Library/Containers/com.chrisfinns.sustain/Data/tmp/sustain-snapshots/*.png screens/ 2>/dev/null || true
-          cp /tmp/sustain-ui/* screens/ 2>/dev/null || true
-          for f in screens/ui-*.txt; do [ -f "$f" ] && { echo "=== $f"; head -c 6000 "$f"; echo; }; done
-          ls -la screens
+          # Failure screenshots that XCTest keeps in the result bundle.
+          for r in build/Logs/Test/*.xcresult; do
+            [ -d "$r" ] || continue
+            mkdir -p screens/failures
+            xcrun xcresulttool export attachments --path "$r" --output-path screens/failures >/dev/null 2>&1 || true
+          done
+          [ -f screens/failures/manifest.json ] && python3 -c "import json; [print(t.get('testIdentifier'), [a.get('exportedFileName') for a in t.get('attachments', [])][:6]) for t in json.load(open('screens/failures/manifest.json'))]" || true
+          ls -la screens screens/failures 2>/dev/null | head -60
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -91,6 +96,6 @@ jobs:
           git init -q -b ci-screens
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- *.png $(ls ui-*.txt 2>/dev/null)
+          git add -A
           git commit -q -m "Screens for ${GITHUB_SHA::7}"
           git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-screens
