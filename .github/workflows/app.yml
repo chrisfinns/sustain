@@ -5,6 +5,7 @@ on:
     paths:
       - "App/**"
       - "AppTests/**"
+      - "AppUITests/**"
       - "project.yml"
       - "Packages/SustainCore/Sources/**"
       - "Packages/SustainCore/Package.swift"
