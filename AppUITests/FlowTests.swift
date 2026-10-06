@@ -8,6 +8,19 @@ final class FlowTests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// On failure, save what the screen showed and the accessibility tree; CI publishes them with the screenshots.
+    override func tearDown() {
+        let failed = !(testRun?.hasSucceeded ?? true)
+        let name = String(name.split(separator: " ").last ?? "test").trimmingCharacters(in: CharacterSet(charactersIn: "]"))
+        MainActor.assumeIsolated {
+            guard failed, let app else { return }
+            let dir = URL(fileURLWithPath: "/tmp/sustain-ui", isDirectory: true)
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: dir.appendingPathComponent("ui-\(name).png"))
+            try? app.debugDescription.write(to: dir.appendingPathComponent("ui-\(name).txt"), atomically: true, encoding: .utf8)
+        }
+    }
+
     @MainActor
     private func launch() {
         app = XCUIApplication()

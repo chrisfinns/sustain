@@ -70,6 +70,8 @@ jobs:
         run: |
           mkdir -p screens
           cp ~/Library/Containers/com.chrisfinns.sustain/Data/tmp/sustain-snapshots/*.png screens/ 2>/dev/null || true
+          cp /tmp/sustain-ui/* screens/ 2>/dev/null || true
+          for f in screens/ui-*.txt; do [ -f "$f" ] && { echo "=== $f"; head -c 6000 "$f"; echo; }; done
           ls -la screens
       - uses: actions/upload-artifact@v4
         if: always()
@@ -88,6 +90,6 @@ jobs:
           git init -q -b ci-screens
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- *.png
+          git add -- *.png $(ls ui-*.txt 2>/dev/null)
           git commit -q -m "Screens for ${GITHUB_SHA::7}"
           git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-screens
