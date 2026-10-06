@@ -107,17 +107,21 @@ final class FlowTests: XCTestCase {
         let area = app.textFields["Type an area"]
         area.click()
         area.typeText("Grooves\r")
-        XCTAssertTrue(app.buttons["Grooves"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["Grooves"].waitForExistence(timeout: 3), "picked area chip should show")
         area.typeText("\r")
-        XCTAssertTrue(todayRow("Walking line").waitForExistence(timeout: 5))
+        XCTAssertTrue(todayRow("Walking line").waitForExistence(timeout: 5), "item should be saved")
         app.typeKey(",", modifierFlags: .command)
         let trash = app.buttons["Delete Grooves"]
-        XCTAssertTrue(trash.waitForExistence(timeout: 5))
+        XCTAssertTrue(trash.waitForExistence(timeout: 5), "Settings › Areas should list Grooves")
+        for _ in 0..<6 where !trash.isHittable {
+            app.scrollViews.firstMatch.scroll(byDeltaX: 0, deltaY: -400)
+        }
+        XCTAssertTrue(trash.isHittable, "couldn't scroll to Grooves")
         trash.click()
         let undo = app.buttons["Undo"]
-        XCTAssertTrue(undo.waitForExistence(timeout: 3))
+        XCTAssertTrue(undo.waitForExistence(timeout: 3), "Undo toast should appear")
         undo.click()
-        XCTAssertTrue(app.buttons["Rename Grooves"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["Rename Grooves"].waitForExistence(timeout: 3), "Undo should restore Grooves")
         app.typeKey("1", modifierFlags: .command)
         XCTAssertTrue(todayRow("Walking line").waitForExistence(timeout: 5))
     }

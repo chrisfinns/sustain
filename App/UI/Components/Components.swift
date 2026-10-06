@@ -235,6 +235,7 @@ struct ToastView: View {
 /// Dimmed overlay with a top-anchored panel, like the mockup's Capture and Session complete.
 struct ModalOverlay<Content: View>: View {
     @Environment(\.theme) private var theme
+    @Environment(\.isSnapshot) private var isSnapshot
     var maxWidth: CGFloat = 620
     let onDismiss: () -> Void
     @ViewBuilder let content: () -> Content
@@ -244,17 +245,22 @@ struct ModalOverlay<Content: View>: View {
             theme[.overlay]
                 .ignoresSafeArea()
                 .onTapGesture(perform: onDismiss)
-            ScrollView {
-                content()
-                    .padding(EdgeInsets(top: 22, leading: 24, bottom: 20, trailing: 24))
-                    .frame(maxWidth: maxWidth)
-                    .background(theme[.surf2], in: RoundedRectangle(cornerRadius: 16))
-                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(theme[.line3]))
-                    .shadow(color: theme[.shadow], radius: 32, y: 24)
-                    .padding(EdgeInsets(top: 64, leading: 16, bottom: 16, trailing: 16))
-                    .frame(maxWidth: .infinity)
+            if isSnapshot {
+                panel
+            } else {
+                ScrollView { panel }.scrollBounceBehavior(.basedOnSize)
             }
-            .scrollBounceBehavior(.basedOnSize)
         }
+    }
+
+    private var panel: some View {
+        content()
+            .padding(EdgeInsets(top: 22, leading: 24, bottom: 20, trailing: 24))
+            .frame(maxWidth: maxWidth)
+            .background(theme[.surf2], in: RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(theme[.line3]))
+            .shadow(color: theme[.shadow], radius: 32, y: 24)
+            .padding(EdgeInsets(top: 64, leading: 16, bottom: 16, trailing: 16))
+            .frame(maxWidth: .infinity)
     }
 }

@@ -39,7 +39,7 @@ struct ScreenshotTests {
                     .environment(\.isSnapshot, true)
                     .environment(app)
                     .modelContainer(container)
-                    .frame(width: 1440, height: name == "5-settings" ? 1800 : 900)
+                    .frame(width: 1440, height: name == "5-settings" ? 1800 : name == "1-today" || name == "4-library" ? 1100 : 900)
                 let renderer = ImageRenderer(content: view)
                 renderer.scale = 1
                 guard let image = renderer.nsImage, let tiff = image.tiffRepresentation,

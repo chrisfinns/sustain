@@ -77,6 +77,7 @@ struct ContentView: View {
     private func scrolling<C: View>(@ViewBuilder _ content: () -> C) -> some View {
         if isSnapshot {
             VStack(spacing: 0) { content(); Spacer(minLength: 0) }
+                .frame(maxHeight: .infinity, alignment: .top)
         } else {
             ScrollView { content() }
         }

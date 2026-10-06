@@ -45,7 +45,9 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(Typo.sectionTitle)
-                if let subtitle { Text(subtitle).font(Typo.meta).foregroundStyle(theme[.muted]) }
+                if let subtitle {
+                    Text(subtitle).font(Typo.meta).foregroundStyle(theme[.muted]).fixedSize(horizontal: false, vertical: true)
+                }
             }
             content()
         }
@@ -58,7 +60,7 @@ struct SettingsView: View {
             HStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(label).fontWeight(.semibold)
-                    Text(desc).font(Typo.meta).foregroundStyle(theme[.muted])
+                    Text(desc).font(Typo.meta).foregroundStyle(theme[.muted]).fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 control()
@@ -242,10 +244,18 @@ private struct AreasSettings: View {
                 Text("Areas").font(Typo.sectionTitle)
                 Text("Optional labels for your items. Today doesn't use them, so rename, recolor or delete freely. Click a name to rename it. Renaming onto an existing area merges the two.")
                     .font(Typo.meta).foregroundStyle(theme[.muted])
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 18, alignment: .top)], alignment: .leading, spacing: 2) {
-                ForEach(sorted) { snap in
-                    if let area = byId[snap.id] { row(area) }
+            // Two plain columns (not a lazy grid): about 20 rows, and every row exists for VoiceOver and UI tests.
+            let half = (sorted.count + 1) / 2
+            HStack(alignment: .top, spacing: 18) {
+                ForEach([Array(sorted.prefix(half)), Array(sorted.dropFirst(half))], id: \.first?.id) { column in
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(column) { snap in
+                            if let area = byId[snap.id] { row(area) }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .top)
                 }
             }
             HStack(spacing: 10) {
