@@ -61,15 +61,16 @@ struct StoreTests {
         let practice = PracticeStore(ctx: ctx, days: days)
         practice.rate(item, .again, now: now, settings: SchedulerSettings(), session: nil)
         practice.rate(item, .good, now: now.addingTimeInterval(600), settings: SchedulerSettings(), session: nil)
-        try ctx.save()
-        #expect(item.reviews?.count == 1)
-        #expect(item.reviews?.first?.rating == .good)
+        let reviews = try ctx.fetch(FetchDescriptor<Review>())
+        #expect(reviews.count == 1)
+        #expect(reviews.first?.rating == .good)
+        #expect(reviews.first?.item?.id == item.id)
         let single = Scheduler(days: days).rate(.new(at: now), .good, at: now.addingTimeInterval(600))
         #expect(item.card.stability == single.stability)
         #expect(practice.queueItem(item, now: now).startedToday)
         practice.rollbackToday(item, now: now)
         #expect(item.card.isNew)
-        #expect(item.reviews?.isEmpty ?? true)
+        #expect(try ctx.fetch(FetchDescriptor<Review>()).isEmpty)
     }
 
     @Test func deletingAnAreaKeepsItsItemsAndUndoRestoresThem() throws {

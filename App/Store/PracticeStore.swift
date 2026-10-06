@@ -7,9 +7,25 @@ struct PracticeStore {
     let ctx: ModelContext
     var days = LocalDays()
 
+    /// Today's reviews of one item, oldest first. Fetched, not read from the relationship,
+    /// so unsaved inserts and deletes are already reflected.
     func todaysReviews(_ item: Item, now: Date) -> [Review] {
         let key = days.dayKey(now)
-        return (item.reviews ?? []).filter { $0.day == key }.sorted { $0.at < $1.at }
+        let itemId = item.id
+        let d = FetchDescriptor<Review>(predicate: #Predicate { $0.day == key && $0.item?.id == itemId },
+                                        sortBy: [SortDescriptor(\.at)])
+        return (try? ctx.fetch(d)) ?? []
+    }
+
+    /// All of today's reviews, grouped by item id, oldest first.
+    func todayIndex(now: Date) -> [String: [Review]] {
+        let key = days.dayKey(now)
+        let d = FetchDescriptor<Review>(predicate: #Predicate { $0.day == key }, sortBy: [SortDescriptor(\.at)])
+        var out: [String: [Review]] = [:]
+        for r in (try? ctx.fetch(d)) ?? [] {
+            if let id = r.item?.id { out[id, default: []].append(r) }
+        }
+        return out
     }
 
     /// Rates an item. A second rating on the same day replaces the first instead of compounding it.
@@ -25,6 +41,7 @@ struct PracticeStore {
         review.session = session
         item.card = next
         item.updatedAt = now
+        try? ctx.save()
         return review
     }
 
@@ -35,11 +52,12 @@ struct PracticeStore {
         for r in today { ctx.delete(r) }
         item.card = base
         item.updatedAt = now
+        try? ctx.save()
     }
 
     /// Today's view of an item for the queue.
-    func queueItem(_ item: Item, now: Date) -> QueueItem {
-        let today = todaysReviews(item, now: now)
+    func queueItem(_ item: Item, now: Date, today: [Review]? = nil) -> QueueItem {
+        let today = today ?? todaysReviews(item, now: now)
         return QueueItem(id: item.id, instrumentId: item.instrument?.id ?? "other", lane: item.lane,
                          paused: item.paused, reference: item.reference, card: item.card, createdAt: item.createdAt,
                          ratedToday: !today.isEmpty, startedToday: today.first?.prevCard?.isNew ?? false)

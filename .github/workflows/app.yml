@@ -28,13 +28,14 @@ jobs:
           sw_vers
       - name: Generate project
         run: |
-          brew install xcodegen
+          brew install xcodegen xcbeautify
           xcodegen generate
       - name: Build and test
         run: |
+          set -o pipefail
           xcodebuild test \
             -project Sustain.xcodeproj \
             -scheme Sustain \
-            -destination 'platform=macOS' \
+            -destination 'platform=macOS,arch=arm64' \
             -derivedDataPath build \
-            -quiet
+            | xcbeautify --renderer github-actions

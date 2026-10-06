@@ -2,9 +2,11 @@ import SwiftUI
 import SustainCore
 
 enum Screen: String, CaseIterable, Identifiable {
-    case today, library, notes, log, settings
+    case today, library, notes, log, settings, practice
 
     var id: String { rawValue }
+
+    static let sidebar: [Screen] = [.today, .library, .notes, .log, .settings]
 
     var title: String {
         switch self {
@@ -13,6 +15,7 @@ enum Screen: String, CaseIterable, Identifiable {
         case .notes: "Notes"
         case .log: "Log"
         case .settings: "Settings"
+        case .practice: "Practice"
         }
     }
 
@@ -23,6 +26,7 @@ enum Screen: String, CaseIterable, Identifiable {
         case .notes: "pencil.line"
         case .log: "chart.bar.xaxis"
         case .settings: "slider.horizontal.3"
+        case .practice: "play.fill"
         }
     }
 }
@@ -86,7 +90,7 @@ private struct Sidebar: View {
             .buttonStyle(.plain)
 
             VStack(spacing: 2) {
-                ForEach(Screen.allCases) { s in
+                ForEach(Screen.sidebar) { s in
                     Button { screen = s } label: {
                         HStack(spacing: 12) {
                             Image(systemName: s.symbol).frame(width: 18)

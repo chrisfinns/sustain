@@ -28,7 +28,7 @@ struct MediaStore {
         if FileManager.default.fileExists(atPath: dest.path) { try FileManager.default.removeItem(at: dest) }
         try FileManager.default.copyItem(at: source, to: dest)
         let size = (try? FileManager.default.attributesOfItem(atPath: dest.path)[.size] as? Int) ?? 0
-        return (name, size ?? 0)
+        return (name, size)
     }
 
     /// Writes pasted data (e.g. a screenshot).
