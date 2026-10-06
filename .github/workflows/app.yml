@@ -39,3 +39,15 @@ jobs:
             -destination 'platform=macOS,arch=arm64' \
             -derivedDataPath build \
             | xcbeautify --renderer github-actions
+      - name: Collect screenshots
+        if: always()
+        run: |
+          mkdir -p screens
+          cp ~/Library/Containers/com.chrisfinns.sustain/Data/tmp/sustain-snapshots/*.png screens/ 2>/dev/null || true
+          ls -la screens
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens
+          path: screens/
+          if-no-files-found: ignore

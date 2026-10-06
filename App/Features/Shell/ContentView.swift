@@ -36,6 +36,7 @@ enum Screen: String, CaseIterable, Identifiable {
 struct ContentView: View {
     @Environment(\.theme) private var theme
     @Environment(AppModel.self) private var app
+    @Environment(\.isSnapshot) private var isSnapshot
 
     var body: some View {
         HStack(spacing: 0) {
@@ -45,7 +46,7 @@ struct ContentView: View {
                 .overlay(alignment: .trailing) {
                     Rectangle().fill(theme[.sideLine]).frame(width: 1)
                 }
-            ScrollView {
+            scrolling {
                 Group {
                     switch app.screen {
                     case .today: TodayView().frame(maxWidth: 980, alignment: .leading)
@@ -70,6 +71,15 @@ struct ContentView: View {
             }
         }
         .animation(.easeOut(duration: 0.15), value: app.toast)
+    }
+
+    @ViewBuilder
+    private func scrolling<C: View>(@ViewBuilder _ content: () -> C) -> some View {
+        if isSnapshot {
+            VStack(spacing: 0) { content(); Spacer(minLength: 0) }
+        } else {
+            ScrollView { content() }
+        }
     }
 }
 

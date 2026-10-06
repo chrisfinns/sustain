@@ -8,16 +8,23 @@ struct SustainApp: App {
     @State private var app: AppModel
 
     init() {
-        // UI tests run against a fresh in-memory store and their own settings.
+        // UI tests and the demo run against a fresh in-memory store and their own settings.
+        // -demo fills it with the mockup's sample items.
         let uiTest = CommandLine.arguments.contains("-uitest")
+        let demo = CommandLine.arguments.contains("-demo")
         let container: ModelContainer
         do {
-            container = try Store.makeContainer(inMemory: uiTest)
+            container = try Store.makeContainer(inMemory: uiTest || demo)
         } catch {
             fatalError("Sustain couldn't open its data store: \(error)")
         }
-        try? Seeder.run(container.mainContext)
-        let defaults = uiTest ? UserDefaults(suiteName: "sustain.uitest.\(UUID().uuidString)") ?? .standard : .standard
+        if demo {
+            try? SampleData.load(container.mainContext)
+        } else {
+            try? Seeder.run(container.mainContext)
+        }
+        let throwaway = uiTest || demo
+        let defaults = throwaway ? UserDefaults(suiteName: "sustain.temp.\(UUID().uuidString)") ?? .standard : .standard
         _app = State(initialValue: AppModel(container: container, settings: AppSettings(defaults: defaults)))
     }
 

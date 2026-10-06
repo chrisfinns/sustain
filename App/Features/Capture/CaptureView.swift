@@ -78,6 +78,12 @@ struct CaptureView: View {
             }
         }
         .onAppear(perform: setUp)
+        .defaultFocus($nameFocused, true)
+        .task {
+            // Focus set during the first layout pass can be dropped; set it again once the overlay is up.
+            try? await Task.sleep(for: .milliseconds(80))
+            nameFocused = true
+        }
         .onKeyPress(phases: .down) { press in handleKey(press) }
         .onExitCommand { if areaText.isEmpty { close() } }
         .fileImporter(isPresented: $importing, allowedContentTypes: [.pdf, .image, .audio, .item], allowsMultipleSelection: true) { result in

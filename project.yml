@@ -82,3 +82,11 @@ schemes:
       targets:
         - SustainTests
         - SustainUITests
+  Sustain Demo:
+    build:
+      targets:
+        Sustain: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "-demo": true

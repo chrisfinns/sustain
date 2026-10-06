@@ -22,6 +22,8 @@ nonisolated struct Theme: Sendable {
 
 extension EnvironmentValues {
     @Entry var theme: Theme = .dark
+    /// True when rendering screenshots offscreen: scroll views are replaced by plain stacks.
+    @Entry var isSnapshot = false
 }
 
 private struct Themed: ViewModifier {
