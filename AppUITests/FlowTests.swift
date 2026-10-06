@@ -12,6 +12,8 @@ final class FlowTests: XCTestCase {
     override func tearDown() {
         let failed = !(testRun?.hasSucceeded ?? true)
         let name = String(name.split(separator: " ").last ?? "test").trimmingCharacters(in: CharacterSet(charactersIn: "]"))
+        // UI tests run on the main thread; XCUIApplication just isn't marked Sendable.
+        nonisolated(unsafe) let app = self.app
         MainActor.assumeIsolated {
             guard failed, let app else { return }
             let dir = URL(fileURLWithPath: "/tmp/sustain-ui", isDirectory: true)
