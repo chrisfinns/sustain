@@ -1,5 +1,7 @@
 # Sustain: a spaced-repetition practice app for musicians
 
+> **Oct 6: Sustain is now a native macOS app.** The build plan is `docs/SWIFT_PLAN.md`. It replaces this file's Delivery, Stack, Structure, Roadmap and Verification sections (PWA, Dexie, React). The product rules here still apply: principles, Areas, Warm-up lanes, scheduler semantics and Visual design.
+
 ## Context
 Chris's Notion "Guitar Tracker" template (Guitar Knowledge DB, Practice Log, Daily Practice Session, 🟢 Good / 🔴 Again buttons) works, but it's stuck inside Notion: it's guitar-only, needs formula and button setup, and the practice session has to be built by hand. Goal: a standalone **"Anki for any instrument"** that's easy to use, with media (PDF, screenshots, YouTube, recordings) and notes inside each item.
 
