@@ -107,8 +107,8 @@ final class FlowTests: XCTestCase {
         let area = app.textFields["Type an area"]
         area.click()
         area.typeText("Grooves\r")
-        name.click()
-        name.typeText("\r")
+        XCTAssertTrue(app.buttons["Grooves"].waitForExistence(timeout: 3))
+        area.typeText("\r")
         XCTAssertTrue(todayRow("Walking line").waitForExistence(timeout: 5))
         app.typeKey(",", modifierFlags: .command)
         let trash = app.buttons["Delete Grooves"]
