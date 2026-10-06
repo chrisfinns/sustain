@@ -10,14 +10,22 @@ What it builds on:
 This replaces the Delivery, Stack, Structure, Roadmap and Verification sections of `docs/PLAN.md`, which describe the old PWA.
 
 ## Status (Oct 6)
-M0 is underway on `claude/gallant-gauss-7axdni`; CI builds and tests both the Linux Core package and the macOS app.
+M0 is built on `claude/gallant-gauss-7axdni`. CI is green on both Linux (Core) and macOS 26 (the app).
 
 - **Done:**
   - **SustainCore:** FSRS port matching ts-fsrs on 1,566 golden steps; Today queue, lanes, streak and heatmap; area rules; Paper & Ink theme matching the mockup's tokens, plus the contrast gate; link parsing; backup format v1.
   - **Store:** SwiftData SchemaV1, seeding, media files, area/item/practice stores.
   - **Screens:** shell and sidebar, Today, Capture, practice card (with the YouTube A–B loop and speed), Library, Settings with JSON export, and a Debug › YouTube Test window.
-- **Waiting on Chris:** run the YouTube test on his Mac and paste the report (see `README.md`).
-- **Next:** UI tests for the keyboard flows on CI, CI screenshots of each screen to compare with the mockup, then a week of daily use.
+  - **Tests:** unit tests for the stores; UI tests for the plan's keyboard flows (Capture with only a name, type-to-create an area, Esc twice, ⇧Enter, rate with 3, delete an area and Undo).
+  - **Screenshots:** every screen in dark and light, rendered with the mockup's sample data and pushed by CI to the `ci-screens` branch. Cloud sessions can `git fetch` them and compare against the mockup.
+  - **Demo:** the "Sustain Demo" scheme (`-demo`) runs with that sample data in memory.
+- **Bugs the UI tests caught and fixed:**
+  - Capture opened without keyboard focus.
+  - The toast hid its Undo button from VoiceOver, and only the word "Undo" was clickable.
+  - Settings › Areas rows below the fold didn't exist for VoiceOver.
+- **Waiting on Chris:**
+  1. Run the YouTube test on his Mac and paste the report (see `README.md`).
+  2. Use the app daily for a week.
 
 Small deviations made while building M0. Revisit if they feel wrong in use:
 - **YouTube player:** uses `WKWebView`, the known-good path. SwiftUI's `WebView` can replace it later.
