@@ -13,6 +13,95 @@ Decisions made:
 
 Repo: `chrisfinns/sustain`, branch `claude/gallant-gauss-7axdni`. So far it only has `docs/PLAN.md`. The mockup is at https://claude.ai/artifact/TSe1AHctNW6q3tCF7dqDYC (source in the scratchpad at `sustain-canvas/project/Main.dc.html`).
 
+## Revision 3 (now): lock in Paper & Ink ("soft clay")
+Chris picked **soft clay**, which is the dark half of **Paper & Ink**: ink #1A1917, cream text #EDE6D6, clay accent #E8876D. The light half, paper #F5F1E8 with red clay #A9412A, is used when the computer is in light mode, and mode stays **System**. Chris will make detailed edits directly on the canvas, so **their edits win**: read before every publish and never overwrite them.
+
+Steps:
+1. **Read the live canvas first.** Use `action: "read"` for `project/canvas.json` and `project/Main.dc.html` in case Chris has already started editing, and apply my changes onto those versions.
+2. **Make Paper & Ink the default in `Main.dc.html`:**
+   - `data-props.palette.default` → `"paper"`;
+   - `paletteNow()` fallback `'studio'` → `'paper'`;
+   - `buildTheme`'s unknown-dir fallback → `paper`;
+   - put Paper & Ink first in `themeBases()`, so it is the first card in Settings › Appearance.
+   Mode default stays `system`.
+3. **Canvas index:**
+   - `launch` → `{view: 'canvas', page: 'screens'}`, since that's where the edits happen;
+   - Color schemes page note → "Color schemes · chosen: Paper & Ink (soft clay)";
+   - keep the 8 boards there for reference.
+4. **Re-run the gates** (`node --check`, template names for every start × palette × mode, the interaction harness, contrast), then publish only the changed files to the same URL.
+5. **Add a "Visual design" section to `docs/PLAN.md`:**
+   - palette with the base hexes for both modes;
+   - the derived token list;
+   - fonts: Instrument Sans for UI, IBM Plex Mono for numbers;
+   - contrast rules: text ≥ 7:1, small text ≥ 4.5:1, dots ≥ 3:1;
+   - "area/instrument colors are names, resolved per mode";
+   - in the real app, tokens become CSS custom properties set on `:root` for `prefers-color-scheme`, plus a manual override.
+   Then commit and push to `claude/gallant-gauss-7axdni`.
+6. **When Chris says his edits are done:**
+   - read every changed `.dc.html` from the canvas (`list` with `scope: "files"`, then `read` with `path`);
+   - diff against the scratchpad copies;
+   - summarize what changed and fold it into the plan before M0.
+
+## Revision 2: color scheme, "show me"
+Chris asked to see the color directions and chose **both modes, following the system setting**. So the mockup becomes themeable, and a "Color schemes" page on the canvas shows the Today screen in all 4 directions × dark and light (8 boards) to pick from.
+
+**1. Tokenize `Main.dc.html`.** Today it has 53 distinct hardcoded hexes (379 uses in the markup, 133 in JS).
+- A Python script maps each hex to a semantic token and rewrites it as `{{ t.<token> }}`. Style holes are allowed because palette and mode are declared tweak props.
+- JS color literals become `T.<token>`.
+- Tokens:
+  - Ground and surfaces: `bg`, `side`, `dim`, `surf`, `surf2`, `surf3`, `raised`, `raised2`, `track`, `sel`, `sel2`, `sel3`
+  - Lines: `line`…`line6`, `sideLine`
+  - Text: `text`, `textSoft`, `muted`, `faint`, `disabled`
+  - Accent: `accent`, `onAccent`, `accentTint`, `accentTint2`, `accentLine`, `heat1`, `heat2`
+  - Ratings: `again`/`hard`/`good`/`easy`, each with a `…Line` and `…Tint`
+  - Status: `violet`, `violetTint`
+  - Overlays: `overlay`, `shadow`
+- The video box and the PDF page keep fixed colors in both modes, since a player is black and paper is light. That block is handled before the global replace.
+- **Area and instrument colors become token names**, as the plan's data model already says: amber, coral, rose, violet, blue, teal, green, slate. They resolve to a dark-mode or light-mode hex. `seedAreas`, `instMeta` and `palette()` store names; `cycleColor` and `leastUsedColor` work on names.
+
+**2. Theme generator** (`themes()` + `buildTheme(dir, mode)`):
+- Each direction defines only base colors per mode: `bg`, `surf`, `text`, `accent`, `onAccent` and the 4 rating colors.
+- Everything else is derived:
+  - Dark mode: surfaces, fills and lines mix `bg` toward `text` (2–30%).
+  - Light mode: card surfaces mix `bg` toward white; fills and lines mix toward `text`.
+  - Tints: a mix of 14–18% rating or accent color.
+- **Directions:**
+
+  | Direction | Mode | Background | Text | Accent |
+  |---|---|---|---|---|
+  | Studio Night | dark | #111113 | #ECE8E1 | #F0A73A |
+  | Studio Night | light | #F4F2EE | #1B1A18 | #A85F00 |
+  | Analog Console | dark | #17181A | #E9E4D8 | #E8833A |
+  | Analog Console | light | #EFEBE3 | #22201C | #B4531A |
+  | Circuit | dark | #0B0B0B | #F5F5F2 | #FF5B1F |
+  | Circuit | light | #F2F2EF | #0B0B0B | #D93D00 |
+  | Paper & Ink | light | #F5F1E8 | #1D1C1A | #B4462B |
+  | Paper & Ink | dark | #1A1917 | #EDE6D6 | #E07A5F |
+
+  Light-mode ratings are darker (for example Again #B83A2E, Hard #8A6100, Good #2D54C4, Easy #1E7A5E).
+- **Contrast gate (harness):**
+  - for every theme: text/bg ≥ 7, muted and faint on every surface ≥ 4.5, rating and accent text on surf and tints ≥ 4.5, onAccent/accent ≥ 4.5;
+  - data dots ≥ 3 against their surface;
+  - any failure is adjusted before publishing.
+
+**3. Props and Settings:**
+- Replace the `accent` tweak with `palette` (studio | console | circuit | paper, default studio) and `mode` (system | dark | light, default system).
+- `system` reads `matchMedia('(prefers-color-scheme: dark)')` inside try/catch and updates live through a change listener added in componentDidMount and removed on unmount.
+- New **Settings › Appearance** section with 4 palette cards (swatches + name) and a System / Dark / Light segmented control. These are state overrides, like Simple mode.
+
+**4. Canvas:**
+- Add `pages`: Screens (the existing 9 boards) and Color schemes.
+- 8 new tiny wrapper boards, `Colors-<dir>-<mode>.dc.html`, each `<dc-import name="Main" start="today" palette=… mode=…>`.
+- Grid layout: 4 columns (directions) × 2 rows (dark, light), each board 1440×900.
+- Title note: "Pick a color scheme".
+- `launch: {view: 'canvas', page: 'colors'}`.
+
+**5. Verification:**
+- `node --check`, plus the template-names check for every start × palette × mode.
+- The existing 53 interaction checks still pass.
+- New: the contrast gate for all 8 themes, and a guard that no stray hex is left in the markup outside the fixed video/PDF block.
+- Republish to the same URL. After Chris picks a direction, record it in `docs/PLAN.md` (new "Visual design" section), then commit and push.
+
 ## This revision: what gets done now
 1. Update the clickable mockup (`Main.dc.html`) to the new Capture, Areas and Warm-up design (see "Mockup changes" below), then republish to the same Artifact URL.
 2. Copy this plan to `docs/PLAN.md`, commit and push to `claude/gallant-gauss-7axdni`.
@@ -119,6 +208,33 @@ Shell: a left sidebar (Today, Library, Notes, Log, Settings, instrument filter, 
 |                                         [Save]    |
 +---------------------------------------------------+
 ```
+
+## Visual design (decided Oct 6)
+- **Palette: Paper & Ink.** It follows the computer's light/dark setting, with a manual System / Dark / Light override in Settings › Appearance.
+
+  | Mode | Background | Text | Accent | On accent | Again | Hard | Good | Easy |
+  |---|---|---|---|---|---|---|---|---|
+  | Dark ("soft clay") | ink #1A1917 | cream #EDE6D6 | soft clay #E8876D | #1A0A05 | #E8806E | #E2B65A | #86A8F0 | #6CC4A4 |
+  | Light | paper #F5F1E8 | ink #1D1C1A | red clay #A9412A | #FFFFFF | #B23A2E | #835C00 | #2D54C4 | #1A715A |
+
+- **Only those base colors are hand-picked.** Everything else is derived:
+  - Dark mode: surfaces, fills and lines mix bg toward text (2–30%).
+  - Light mode: cards mix bg toward white; fills and lines mix toward text.
+  - Tints: 10–18% of a rating or accent color.
+  - Token names: `bg side dim surf surf2 surf3 raised raised2 track sel sel2 sel3 line…line6 text textSoft muted faint disabled accent onAccent accentTint accentTint2 accentLine heat1 heat2 again/hard/good/easy (+Line, +Tint) violet violetTint overlay shadow`.
+- **Area and instrument colors are names** (amber, coral, rose, violet, blue, teal, green, slate), resolved to a readable hex per mode.
+- **Fixed colors:** the video player stays black and the PDF page stays paper in both modes.
+- **Contrast rules**, enforced by a test over every theme:
+  - body text ≥ 7:1 on bg
+  - all small text ≥ 4.5:1 on every surface it sits on
+  - text on accent ≥ 4.5:1
+  - color dots ≥ 3:1
+- **Type:** Instrument Sans for UI, IBM Plex Mono for numbers (BPM, timers, intervals, counts).
+- **In the real app:**
+  - Tokens become CSS custom properties on `:root`, with dark/light sets switched by `prefers-color-scheme` and a `data-theme` override.
+  - Tailwind's theme maps to those variables.
+  - The theme generator lives in `src/ui/theme.ts`, with a `theme.test.ts` contrast gate.
+  - The other three directions (Studio Night, Analog Console, Circuit) stay in the mockup only for reference.
 
 ## Scheduler: FSRS via `ts-fsrs` (MIT, open-spaced-repetition)
 - Buttons with musician meanings (shown as tooltips):
