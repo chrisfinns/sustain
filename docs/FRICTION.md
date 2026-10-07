@@ -19,6 +19,10 @@ Review on Oct 14: sort everything into fix-now, M1, or drop.
 - **Oct 7 · Can't delete a PDF, image or take.** Once a file was attached to an item, there was no way to remove it.
   - Fixed Oct 7: right-click any PDF, image or take for **Open** and **Delete…**. Delete asks first, then removes Sustain's copy. The original in Finder isn't touched. A unit test covers it; the menu itself is untested, so check it by hand.
   - Items themselves: right-click a row in Library to delete one (that was already there). Today's rows have no right-click menu yet.
+- **Oct 7 · No piano for vocal scales.** Warming up needs a piano that plays the scale and moves it up by half steps; Sustain had nothing for that.
+  - Added Oct 7: Voice items get a **Scales** tab (it opens there when the item has no video or files). Pick a pattern (1 2 3 2 1, five-note, arpeggio, octave…), the starting notes (e.g. C3 to G3), direction and speed, then press **Play** or **Space**. Each round is the chord, then the pattern, then a breath. Hold any key on the keyboard to hear that note. Changing a setting stops playback.
+  - Tests: the scale logic has unit tests; the panel renders in the screenshot test (`6-scales-*.png` in CI's "screens" artifact). The sound itself is untested, since CI has no speakers. Check by ear: it should sound like a grand piano, not a beep.
+  - Open questions: should each item remember its own range and pattern? Do you want minor or other patterns, or a different chord (none, or just the root)?
 - **Oct 7 · No app icon.** Sustain shows the generic icon in the Dock, so it's hard to spot. **Parked until after the M0 week.**
   - Brief for the designer: https://claude.ai/code/artifact/0301816b-c18c-4dbe-b72a-f76c6ffdaf0a. Claude's rejected sketches: `design/icon-concepts/` and the "Sustain Icon Concepts" canvas.
   - References Chris likes: Sonofield Ear Trainer and Windtone (small motif, deep tile, a little material such as glow or brass), and Teenage Engineering (warm, tactile, playful). Logic is too layered; Ableton is too simple.
