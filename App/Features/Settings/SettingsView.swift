@@ -26,6 +26,11 @@ struct SettingsView: View {
             instrumentsCard
             AreasSettings()
             yourData
+            Text(versionLine)
+                .font(Typo.mono(12))
+                .foregroundStyle(theme[.faint])
+                .textSelection(.enabled)
+                .help("Note this with any bug, so you know which build it was")
         }
         .fileExporter(isPresented: $exporting, document: exportDoc, contentType: .json,
                       defaultFilename: BackupExport.fileName()) { result in
@@ -37,6 +42,12 @@ struct SettingsView: View {
                 app.flash("Couldn't save the backup: \(error.localizedDescription)")
             }
         }
+    }
+
+    /// "Sustain 0.3.0 (57)": the build number is the commit count from tools/install.sh, or 1 for a run from Xcode.
+    private var versionLine: String {
+        let info = Bundle.main.infoDictionary
+        return "Sustain \(info?["CFBundleShortVersionString"] as? String ?? "?") (\(info?["CFBundleVersion"] as? String ?? "?"))"
     }
 
     // MARK: - Cards
