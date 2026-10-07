@@ -1,3 +1,4 @@
+import AppKit
 import XCTest
 
 /// End-to-end flows from the plan (the old Playwright list), run against a fresh in-memory store.
@@ -97,6 +98,31 @@ final class FlowTests: XCTestCase {
         app.typeKey("3", modifierFlags: [])
         XCTAssertTrue(app.staticTexts["Good"].waitForExistence(timeout: 5), "Done today should show the rating")
         XCTAssertTrue(app.buttons["Re-rate"].exists)
+    }
+
+    @MainActor
+    func testPastingScreenshotsOnThePracticeCardAttachesThem() throws {
+        // A tiny PNG on the clipboard, as if a screenshot was just copied.
+        let rep = try XCTUnwrap(NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 2, pixelsHigh: 2, bitsPerSample: 8,
+                                                 samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                                 colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0))
+        let png = try XCTUnwrap(rep.representation(using: .png, properties: [:]))
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setData(png, forType: .png)
+
+        launch()
+        let name = openCapture()
+        name.typeText("Chorus riff\r")
+        let row = todayRow("Chorus riff")
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.click()
+        XCTAssertTrue(app.buttons["End session"].waitForExistence(timeout: 5))
+        app.typeKey("v", modifierFlags: .command)
+        XCTAssertTrue(app.staticTexts["Screenshot 1"].waitForExistence(timeout: 5), "⌘V on the card should attach the screenshot")
+        let tile = app.buttons["Paste a screenshot"]
+        XCTAssertTrue(tile.waitForExistence(timeout: 3), "Images tab should offer the paste tile")
+        tile.click()
+        XCTAssertTrue(app.staticTexts["Screenshot 2"].waitForExistence(timeout: 5), "the paste tile should attach another one")
     }
 
     @MainActor

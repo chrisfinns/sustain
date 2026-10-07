@@ -212,7 +212,7 @@ struct AttachmentList: View {
             VStack(spacing: 10) {
                 ForEach(attachments) { a in
                     HStack(spacing: 14) {
-                        Image(systemName: a.kind == .pdf ? "doc.richtext" : "waveform")
+                        Image(systemName: a.kind == .audio ? "waveform" : a.kind == .pdf ? "doc.richtext" : "doc")
                             .frame(width: 36, height: 36)
                             .background(theme[.line], in: Circle())
                         Text(a.name).fontWeight(.semibold).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
@@ -236,7 +236,7 @@ struct ImageGrid: View {
     @Environment(\.theme) private var theme
     @Environment(AppModel.self) private var app
     let attachments: [Attachment]
-    var item: Item? { attachments.first?.item }
+    let onPaste: () -> Void
 
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 12)], spacing: 12) {
@@ -259,10 +259,20 @@ struct ImageGrid: View {
                     Text(a.name).font(Typo.small).foregroundStyle(theme[.muted]).lineLimit(1)
                 }
             }
-        }
-        if attachments.isEmpty {
-            EmptyMediaState(icon: "photo.on.rectangle", title: "No images yet",
-                            text: "Add screenshots in Capture with + Screenshot, or drop image files there.") { EmptyView() }
+            Button(action: onPaste) {
+                VStack(spacing: 8) {
+                    Image(systemName: "plus").font(.system(size: 18, weight: .medium))
+                    Text("Paste a screenshot").font(Typo.meta)
+                    KeyCap("⌘V")
+                }
+                .foregroundStyle(theme[.muted])
+                .frame(maxWidth: .infinity)
+                .aspectRatio(4 / 3, contentMode: .fit)
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(theme[.line5], style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])))
+                .contentShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Paste a screenshot")
         }
     }
 }

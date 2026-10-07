@@ -14,6 +14,13 @@ struct MediaStore {
         return MediaStore(root: root)
     }
 
+    /// A fresh folder in tmp, for UI tests and the demo, so they never touch the real media.
+    static func temporary() throws -> MediaStore {
+        let root = FileManager.default.temporaryDirectory.appending(path: "Sustain-Media-\(UUID().uuidString)", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        return MediaStore(root: root)
+    }
+
     func url(for fileName: String) -> URL {
         root.appending(path: fileName, directoryHint: .notDirectory)
     }

@@ -56,7 +56,8 @@ final class YouTubePlayerModel {
     func pause() { run("sustain.pause()") }
     func togglePlay() { isPlaying ? pause() : play() }
     func seek(_ seconds: Double) { run("sustain.seek(\(seconds))") }
-    func setRate(_ r: Double) { run("sustain.setRate(\(r))") }
+    /// `check: true` reports back what YouTube actually applied (the YouTube test's speed check).
+    func setRate(_ r: Double, check: Bool = false) { run("sustain.setRate(\(r), \(check))") }
     func mark(_ which: String) { run("sustain.mark('\(which)')") }
 
     func setLoop(a: Double?, b: Double?, on: Bool) {
@@ -134,9 +135,14 @@ struct YouTubePlayerView: NSViewRepresentable {
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.mediaTypesRequiringUserActionForPlayback = []
+        // The A–B loop polls every 50 ms. Throttled timers would let it overshoot B by up to a second
+        // whenever another app's window covers Sustain (e.g. a DAW while playing along).
+        config.preferences.inactiveSchedulingPolicy = .none
         config.userContentController.add(context.coordinator, name: "sustain")
         let web = WKWebView(frame: .zero, configuration: config)
         web.underPageBackgroundColor = .black
+        // A file dropped on the player would replace it with the file. Let the drop reach the card, which attaches it.
+        web.unregisterDraggedTypes()
         model.webView = web
         context.coordinator.loadIfNeeded(web)
         return web

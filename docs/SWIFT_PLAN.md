@@ -23,9 +23,14 @@ M0 is built on `claude/gallant-gauss-7axdni`. CI is green on both Linux (Core) a
   - Capture opened without keyboard focus.
   - The toast hid its Undo button from VoiceOver, and only the word "Undo" was clickable.
   - Settings › Areas rows below the fold didn't exist for VoiceOver.
+- **YouTube test (M0 step 1), run by Chris Oct 6 on macOS 26.6.2:** passed.
+  - **Embed:** plays in the sandboxed app with no referrer errors.
+  - **Speeds:** 50, 60, 75, 85 and 100 % all stick. `getAvailablePlaybackRates()` lists only 25 % steps, but YouTube accepts the in-between rates, so the practice card keeps the mockup's five speeds. Caveat: "got" is what `getPlaybackRate()` reports, not a measured playback speed.
+  - **Loop:** natural wraps overshot B by 28 and 60 ms (target ≤ 100 ms). The reported worst of 1434 ms was a test artifact: turning Loop on after setting B, with the playhead already past B, counted the jump back to A as a wrap. Fixed in `player.html`: only playing across B counts.
+  - **Hardening after the test:** the player's web view no longer has its timers throttled while Sustain is covered by another window (`inactiveSchedulingPolicy = .none`), so the loop should stay tight with a DAW in front. Not yet checked on the Mac.
 - **Waiting on Chris:**
-  1. Run the YouTube test on his Mac and paste the report (see `README.md`).
-  2. Use the app daily for a week.
+  1. Use the app daily for a week (Oct 7–14), logging friction in `docs/FRICTION.md`. Installed at `/Applications/Sustain.app` (Release build).
+  2. Once, with a loop running, cover Sustain with another app's window and listen for late jumps back to A.
 
 Small deviations made while building M0. Revisit if they feel wrong in use:
 - **YouTube player:** uses `WKWebView`, the known-good path. SwiftUI's `WebView` can replace it later.
@@ -269,7 +274,7 @@ Done when: Chris captures in under 30 s, practices a full Today with keys only, 
 
 **M1: media + notes**
 - PDF tab, Images tab (paste, drop, Quick Look) and playback of attached audio on the Takes tab
-- Drop and paste on the practice card
+- ~~Drop and paste on the practice card~~ (pulled into M0 on Oct 7; see `docs/FRICTION.md`)
 - `/` insert in notes, and links
 
 **M2: sessions + log**
@@ -324,7 +329,7 @@ Done when: Chris captures in under 30 s, practices a full Today with keys only, 
 - **YouTube in a web view:**
   - Embeds without a referrer fail (errors 152/153). Load `player.html` with an https `baseURL` and pass `origin` / `widget_referrer`.
   - Not every speed may be honored. If 60 % or 85 % get rounded, show only the rates `getAvailablePlaybackRates()` returns between 50 and 100 %.
-  - The step 1 spike settles both before anything else is built.
+  - Settled by the step 1 test (Oct 6): the referrer setup works, and 60 % and 85 % are honored.
 - **Writing SwiftUI without a Mac in the loop:** mitigated by the thin app layer, macOS CI on every app PR, and the PNG snapshots.
 - **Arrow and Enter keys in a focused SwiftUI `TextField`** may not reach `.onKeyPress` on macOS. Fallback: a small `NSTextField` wrapper that handles `moveUp`, `moveDown`, `insertNewline` and `cancelOperation` in `doCommandBy`, used only by `AreaPicker` and Capture.
 - **SwiftData quirks:** keep queries simple and filter in memory (a few thousand items at most). All writes go through the Store types, so swapping to GRDB later would touch only `App/Store`.

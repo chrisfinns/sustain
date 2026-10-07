@@ -16,6 +16,7 @@
   var player = null;
   var loop = { a: null, b: null, on: false };
   var lastTimePost = 0;
+  var prevT = null;
 
   function post(type, body) {
     var msg = Object.assign({ type: type }, body || {});
@@ -46,9 +47,11 @@
     if (!player || !player.getCurrentTime) return;
     var t = player.getCurrentTime();
     if (loop.on && loop.a != null && loop.b != null && loop.b > loop.a && t >= loop.b) {
-      post('loopWrap', { overshoot: t - loop.b });
+      // Only playing across B is a wrap. Turning the loop on (or seeking) past B just jumps to A.
+      if (prevT != null && prevT < loop.b) post('loopWrap', { overshoot: t - loop.b });
       player.seekTo(loop.a, true);
     }
+    prevT = t;
     var now = Date.now();
     if (now - lastTimePost > 250) {
       lastTimePost = now;
@@ -62,10 +65,10 @@
     play: function () { player && player.playVideo(); },
     pause: function () { player && player.pauseVideo(); },
     seek: function (t) { player && player.seekTo(t, true); },
-    setRate: function (r) {
+    setRate: function (r, check) {
       if (!player) return;
       player.setPlaybackRate(r);
-      setTimeout(function () { post('rateSet', { asked: r, got: player.getPlaybackRate() }); }, 500);
+      if (check) setTimeout(function () { post('rateSet', { asked: r, got: player.getPlaybackRate() }); }, 500);
     },
     setLoop: function (a, b, on) { loop = { a: a, b: b, on: on }; },
     mark: function (which) { if (player) post('mark', { which: which, t: player.getCurrentTime() }); }

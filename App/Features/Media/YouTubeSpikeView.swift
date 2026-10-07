@@ -166,7 +166,7 @@ struct YouTubeSpikeView: View {
         player.rateChecks = []
         Task {
             for r in Self.mockupSpeeds {
-                player.setRate(r)
+                player.setRate(r, check: true)
                 try? await Task.sleep(for: .milliseconds(900))
             }
             player.setRate(1)

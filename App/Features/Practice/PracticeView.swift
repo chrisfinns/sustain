@@ -16,6 +16,8 @@ struct PracticeView: View {
     @State private var pickerOpen = false
     @State private var areaText = ""
     @State private var cardChips: [String] = []
+    @State private var importing = false
+    @State private var dropTargeted = false
     @FocusState private var areaFocused: Bool
     @FocusState private var notesFocused: Bool
     @FocusState private var cardFocused: Bool
@@ -60,6 +62,11 @@ struct PracticeView: View {
         .focusEffectDisabled()
         .focused($cardFocused)
         .onKeyPress(phases: .down) { press in handleKey(press) }
+        // ⌘V outside the notes attaches to this item. In the notes, ⌘V pastes text as usual.
+        .onPasteCommand(of: [.fileURL, .png, .tiff]) { _ in paste(into: item) }
+        .fileImporter(isPresented: $importing, allowedContentTypes: [.pdf, .image, .audio, .item], allowsMultipleSelection: true) { result in
+            if case let .success(urls) = result { add(files: urls, to: item) }
+        }
     }
 
     // MARK: - Header
@@ -177,7 +184,8 @@ struct PracticeView: View {
 
     private func media(_ item: Item) -> some View {
         let atts = item.attachments ?? []
-        let pdfs = atts.filter { $0.kind == .pdf }
+        // Other files (Guitar Pro, MusicXML…) are tabs and charts too, so they share the PDF tab.
+        let pdfs = atts.filter { $0.kind == .pdf || $0.kind == .file }
         let images = atts.filter { $0.kind == .image }
         let takes = atts.filter { $0.kind == .audio }
         return VStack(alignment: .leading, spacing: 12) {
@@ -205,6 +213,11 @@ struct PracticeView: View {
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(tab == t ? .isSelected : [])
                 }
+                Spacer()
+                Button("+ File") { importing = true }
+                    .buttonStyle(OutlineButtonStyle(height: 36, radius: 8))
+                    .font(Typo.small)
+                    .help("Attach a PDF, image or audio file. You can also drop files here or paste with ⌘V.")
             }
             switch tab {
             case .video:
@@ -215,14 +228,61 @@ struct PracticeView: View {
                 }
             case .pdf:
                 AttachmentList(attachments: pdfs, emptyTitle: "No PDF yet",
-                               emptyText: "Drop a tab, chart or sheet-music PDF in Capture. The built-in viewer arrives in the next update; for now it opens in Preview.")
+                               emptyText: "Drop a tab, chart or sheet-music PDF here. The built-in viewer arrives in the next update; for now it opens in Preview.")
             case .images:
-                ImageGrid(attachments: images)
+                ImageGrid(attachments: images) { paste(into: item) }
             case .takes:
                 AttachmentList(attachments: takes, emptyTitle: "No takes yet",
-                               emptyText: "Record one when it feels clean so you have something to compare against later. Recording arrives in a later update; dropped audio files show up here.")
+                               emptyText: "Record one when it feels clean so you have something to compare against later. Recording arrives in a later update; for now, drop audio files here.")
             }
         }
+        .dropDestination(for: URL.self) { urls, _ in
+            let files = urls.filter(\.isFileURL)
+            guard !files.isEmpty else { return false }
+            add(files: files, to: item)
+            return true
+        } isTargeted: { dropTargeted = $0 }
+        .overlay {
+            if dropTargeted {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(theme[.accent], style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
+    // MARK: - Adding media
+
+    /// ⌘V or the Images tab's tile: files copied in Finder first, otherwise a screenshot.
+    private func paste(into item: Item) {
+        let pb = NSPasteboard.general
+        let files = pb.fileURLs
+        if !files.isEmpty {
+            add(files: files, to: item)
+        } else if let png = pb.pngImage {
+            let n = (item.attachments ?? []).filter { $0.kind == .image }.count + 1
+            add(pasted: [(data: png, ext: "png", name: "Screenshot \(n)")], to: item)
+        } else {
+            app.flash("No image on the clipboard. Take a screenshot with ⇧⌘⌃4, then try again.")
+        }
+    }
+
+    private func add(files: [URL] = [], pasted: [(data: Data, ext: String, name: String)] = [], to item: Item) {
+        let before = Set((item.attachments ?? []).map(\.id))
+        let failed = ItemStore(ctx: app.ctx, days: app.days).add(files: files, pasted: pasted, to: item, media: app.media, now: .now)
+        app.save()
+        let added = (item.attachments ?? []).filter { !before.contains($0.id) }
+        // Show what was just added.
+        switch added.first?.kind {
+        case .pdf?, .file?: tab = .pdf
+        case .image?: tab = .images
+        case .audio?: tab = .takes
+        case nil: break
+        }
+        var parts: [String] = []
+        if !added.isEmpty { parts.append(added.count == 1 ? "Added \(added[0].name)" : "Added \(added.count) files") }
+        if !failed.isEmpty { parts.append("Couldn't add \(failed.joined(separator: ", "))") }
+        if !parts.isEmpty { app.flash(parts.joined(separator: ". ") + ".") }
     }
 
     // MARK: - Aside
@@ -329,7 +389,7 @@ struct PracticeView: View {
         areaText = ""
         let atts = item.attachments ?? []
         tab = item.youtubeId != nil ? .video
-            : atts.contains { $0.kind == .pdf } ? .pdf
+            : atts.contains { $0.kind == .pdf || $0.kind == .file } ? .pdf
             : atts.contains { $0.kind == .image } ? .images
             : atts.contains { $0.kind == .audio } ? .takes : .video
         if let id = item.youtubeId {

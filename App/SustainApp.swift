@@ -10,7 +10,9 @@ struct SustainApp: App {
     init() {
         // UI tests and the demo run against a fresh in-memory store and their own settings.
         // -demo fills it with the mockup's sample items.
+        // Unit tests run inside the app too; they must never open the real store.
         let uiTest = CommandLine.arguments.contains("-uitest")
+            || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
         let demo = CommandLine.arguments.contains("-demo")
         let container: ModelContainer
         do {
@@ -25,7 +27,8 @@ struct SustainApp: App {
         }
         let throwaway = uiTest || demo
         let defaults = throwaway ? UserDefaults(suiteName: "sustain.temp.\(UUID().uuidString)") ?? .standard : .standard
-        _app = State(initialValue: AppModel(container: container, settings: AppSettings(defaults: defaults)))
+        let media: MediaStore? = throwaway ? try? .temporary() : try? .appDefault()
+        _app = State(initialValue: AppModel(container: container, settings: AppSettings(defaults: defaults), media: media))
     }
 
     var body: some Scene {

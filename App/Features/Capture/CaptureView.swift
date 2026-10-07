@@ -319,7 +319,8 @@ struct CaptureView: View {
         app.save()
         app.lastInstrumentId = instrumentId
         let areaNote = made.newArea.map { " · new area \"\($0.name)\"" } ?? ""
-        let base = "Added \"\(made.item.title)\"\(areaNote)"
+        let lost = made.failed.isEmpty ? "" : ", but couldn't attach \(made.failed.joined(separator: ", "))"
+        let base = "Added \"\(made.item.title)\"\(areaNote)\(lost)"
         if keep {
             areaId = made.item.area?.id
             pendingArea = nil
@@ -334,6 +335,7 @@ struct CaptureView: View {
         } else if practice {
             app.showCapture = false
             app.open(made.item.id, items: items + [made.item])
+            if !made.failed.isEmpty { app.flash(base + ".") }
         } else {
             app.showCapture = false
             app.flash(base + ". It shows up in Today under \(lane == .warmup ? "Warm-up" : "New").")
@@ -353,11 +355,7 @@ struct CaptureView: View {
     }
 
     private func pasteImage() {
-        let pb = NSPasteboard.general
-        if let data = pb.data(forType: .png) {
-            pasted.append(Pasted(data: data, ext: "png", name: "Screenshot \(pasted.count + 1)"))
-        } else if let tiff = pb.data(forType: .tiff), let rep = NSBitmapImageRep(data: tiff),
-                  let png = rep.representation(using: .png, properties: [:]) {
+        if let png = NSPasteboard.general.pngImage {
             pasted.append(Pasted(data: png, ext: "png", name: "Screenshot \(pasted.count + 1)"))
         } else {
             app.flash("No image on the clipboard. Take a screenshot with ⇧⌘⌃4, then try again.")

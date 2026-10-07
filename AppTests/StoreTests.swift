@@ -103,4 +103,29 @@ struct StoreTests {
         #expect(days.daysBetween(now, item.card.due) == 1)
         #expect(item.warmupSince == nil)
     }
+
+    @Test func addingMediaToAnExistingItemCopiesTheFilesAndReportsFailures() throws {
+        try Seeder.run(ctx, now: now)
+        let media = try MediaStore.temporary()
+        defer { try? FileManager.default.removeItem(at: media.root) }
+        var draft = ItemStore.Draft()
+        draft.title = "It's My Life"
+        draft.instrument = try guitar()
+        let items = ItemStore(ctx: ctx, days: days)
+        let item = items.create(draft, media: media, now: now).item
+        let pdf = FileManager.default.temporaryDirectory.appending(path: "Tab-\(UUID().uuidString).pdf")
+        try Data("%PDF-1.4".utf8).write(to: pdf)
+        defer { try? FileManager.default.removeItem(at: pdf) }
+        let missing = FileManager.default.temporaryDirectory.appending(path: "Gone-\(UUID().uuidString).pdf")
+
+        let failed = items.add(files: [pdf, missing], pasted: [(data: Data([0x89, 0x50, 0x4E, 0x47]), ext: "png", name: "Screenshot 1")],
+                               to: item, media: media, now: now)
+        #expect(failed == [missing.lastPathComponent])
+        let atts = (item.attachments ?? []).sorted { $0.name < $1.name }
+        #expect(atts.map(\.kind) == [.image, .pdf])
+        for a in atts { #expect(FileManager.default.fileExists(atPath: media.url(for: a.fileName).path)) }
+        // With no media folder nothing is attached, and the file is reported instead of dropped quietly.
+        #expect(items.add(files: [pdf], to: item, media: nil, now: now) == [pdf.lastPathComponent])
+        #expect(item.attachments?.count == 2)
+    }
 }

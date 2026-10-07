@@ -24,6 +24,8 @@ struct ItemStore {
     struct Created {
         let item: Item
         let newArea: Area?
+        /// Files that couldn't be copied into the media folder.
+        var failed: [String] = []
     }
 
     func create(_ draft: Draft, media: MediaStore?, now: Date) -> Created {
@@ -52,21 +54,38 @@ struct ItemStore {
         case nil:
             break
         }
-        if let media {
-            for url in draft.files {
-                let id = Store.newId("at", now: now)
-                guard let stored = try? media.add(fileAt: url, id: id) else { continue }
-                attach(Attachment(id: id, kind: MediaStore.kind(of: url), name: url.lastPathComponent,
-                                  mime: MediaStore.mime(of: url), size: stored.size, fileName: stored.fileName, createdAt: now), to: item)
+        let failed = add(files: draft.files, pasted: draft.pasted, to: item, media: media, now: now)
+        return Created(item: item, newArea: newArea, failed: failed)
+    }
+
+    /// Copies files and pasted images into the media folder and attaches them to the item.
+    /// Returns the names that couldn't be stored, so callers can say so instead of losing them quietly.
+    @discardableResult
+    func add(files: [URL], pasted: [(data: Data, ext: String, name: String)] = [], to item: Item,
+             media: MediaStore?, now: Date) -> [String] {
+        guard !files.isEmpty || !pasted.isEmpty else { return [] }
+        guard let media else { return files.map(\.lastPathComponent) + pasted.map(\.name) }
+        var failed: [String] = []
+        for url in files {
+            let id = Store.newId("at", now: now)
+            guard let stored = try? media.add(fileAt: url, id: id) else {
+                failed.append(url.lastPathComponent)
+                continue
             }
-            for p in draft.pasted {
-                let id = Store.newId("at", now: now)
-                guard let stored = try? media.add(data: p.data, ext: p.ext, id: id) else { continue }
-                attach(Attachment(id: id, kind: .image, name: p.name, mime: "image/\(p.ext)", size: stored.size,
-                                  fileName: stored.fileName, createdAt: now), to: item)
-            }
+            attach(Attachment(id: id, kind: MediaStore.kind(of: url), name: url.lastPathComponent,
+                              mime: MediaStore.mime(of: url), size: stored.size, fileName: stored.fileName, createdAt: now), to: item)
         }
-        return Created(item: item, newArea: newArea)
+        for p in pasted {
+            let id = Store.newId("at", now: now)
+            guard let stored = try? media.add(data: p.data, ext: p.ext, id: id) else {
+                failed.append(p.name)
+                continue
+            }
+            attach(Attachment(id: id, kind: .image, name: p.name, mime: "image/\(p.ext)", size: stored.size,
+                              fileName: stored.fileName, createdAt: now), to: item)
+        }
+        item.updatedAt = now
+        return failed
     }
 
     private func attach(_ a: Attachment, to item: Item) {
