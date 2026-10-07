@@ -30,7 +30,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.chrisfinns.sustain
         PRODUCT_NAME: Sustain
-        MARKETING_VERSION: 0.1.0
+        # Bump per release: the middle number for features, the last for fixes. See README › Install, versions and bugs.
+        MARKETING_VERSION: 0.3.0
+        # tools/install.sh overrides this with the commit count; 1 means a build run from Xcode.
         CURRENT_PROJECT_VERSION: 1
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Sustain

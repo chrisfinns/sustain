@@ -1,6 +1,6 @@
 # Friction log: M0 week (Oct 7–14)
 
-Use Sustain for real every day. Whenever something slows you down, annoys you, or makes you reach for Notion, add a line: the date, what you were doing, and what got in the way. Don't solve it in your head; just write it down. Paste lines in from your phone if that's easier.
+Use Sustain for real every day. Whenever something slows you down, annoys you, or makes you reach for Notion, add a line: the date, the version (bottom of Settings, e.g. 0.3.0 (57)), what you were doing, and what got in the way. Don't solve it in your head; just write it down. Paste lines in from your phone if that's easier.
 
 Review on Oct 14: sort everything into fix-now, M1, or drop.
 
