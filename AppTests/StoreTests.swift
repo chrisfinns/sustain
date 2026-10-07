@@ -128,4 +128,31 @@ struct StoreTests {
         #expect(items.add(files: [pdf], to: item, media: nil, now: now) == [pdf.lastPathComponent])
         #expect(item.attachments?.count == 2)
     }
+
+    @Test func deletingAnAttachmentRemovesOnlyItAndSustainsCopy() throws {
+        try Seeder.run(ctx, now: now)
+        let media = try MediaStore.temporary()
+        defer { try? FileManager.default.removeItem(at: media.root) }
+        var draft = ItemStore.Draft()
+        draft.title = "Blackbird"
+        draft.instrument = try guitar()
+        let items = ItemStore(ctx: ctx, days: days)
+        let item = items.create(draft, media: media, now: now).item
+        let pdf = FileManager.default.temporaryDirectory.appending(path: "Tab-\(UUID().uuidString).pdf")
+        try Data("%PDF-1.4".utf8).write(to: pdf)
+        defer { try? FileManager.default.removeItem(at: pdf) }
+        items.add(files: [pdf], pasted: [(data: Data([0x89, 0x50, 0x4E, 0x47]), ext: "png", name: "Screenshot 1")],
+                  to: item, media: media, now: now)
+        let tab = try #require(item.attachments?.first { $0.kind == .pdf })
+        let copy = media.url(for: tab.fileName)
+
+        let later = now.addingTimeInterval(60)
+        items.remove(tab, media: media, now: later)
+        try ctx.save()
+        #expect(item.attachments?.map(\.kind) == [.image])
+        #expect(try ctx.fetch(FetchDescriptor<SchemaV1.Attachment>()).count == 1)
+        #expect(!FileManager.default.fileExists(atPath: copy.path))
+        #expect(FileManager.default.fileExists(atPath: pdf.path))
+        #expect(item.updatedAt == later)
+    }
 }

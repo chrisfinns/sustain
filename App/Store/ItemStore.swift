@@ -93,6 +93,15 @@ struct ItemStore {
         a.item = item
     }
 
+    /// Deletes one attachment and Sustain's copy of its file. The original, if it came from Finder, isn't touched.
+    func remove(_ a: Attachment, media: MediaStore?, now: Date) {
+        media?.remove(a.fileName)
+        a.item?.updatedAt = now
+        // Unlink first so the item's list drops it right away, before the save.
+        a.item = nil
+        ctx.delete(a)
+    }
+
     /// Lane changes go through LaneRules: leaving warm-up after practicing it there brings the item back tomorrow.
     func setLane(_ item: Item, _ lane: Lane, now: Date) {
         let out = LaneRules.changeLane(from: item.lane, to: lane, card: item.card, warmupSince: item.warmupSince, now: now, days: days)

@@ -225,6 +225,8 @@ struct AttachmentList: View {
                         .font(Typo.small)
                     }
                     .card(padding: 12, radius: 10)
+                    .contentShape(Rectangle())
+                    .attachmentMenu(a)
                 }
             }
         }
@@ -258,6 +260,7 @@ struct ImageGrid: View {
                     }
                     Text(a.name).font(Typo.small).foregroundStyle(theme[.muted]).lineLimit(1)
                 }
+                .attachmentMenu(a)
             }
             Button(action: onPaste) {
                 VStack(spacing: 8) {
@@ -275,4 +278,38 @@ struct ImageGrid: View {
             .accessibilityLabel("Paste a screenshot")
         }
     }
+}
+
+/// Right-click on a PDF, image or take: open it, or delete it after a confirm.
+private struct AttachmentMenu: ViewModifier {
+    @Environment(AppModel.self) private var app
+    let attachment: Attachment
+    /// The name, kept so the dialog never reads a deleted attachment.
+    @State private var confirming: String?
+
+    func body(content: Content) -> some View {
+        content
+            .contextMenu {
+                Button("Open") {
+                    if let url = app.media?.url(for: attachment.fileName) { NSWorkspace.shared.open(url) }
+                }
+                Divider()
+                Button("Delete…", role: .destructive) { confirming = attachment.name }
+            }
+            .confirmationDialog("Delete \"\(confirming ?? "")\"?", isPresented: Binding(get: { confirming != nil }, set: { if !$0 { confirming = nil } })) {
+                Button("Delete", role: .destructive) {
+                    let name = confirming ?? ""
+                    confirming = nil
+                    ItemStore(ctx: app.ctx).remove(attachment, media: app.media, now: .now)
+                    app.save()
+                    app.flash("Deleted \"\(name)\"")
+                }
+            } message: {
+                Text("It's removed from this item. If you added it from Finder, the original stays where it was. This can't be undone.")
+            }
+    }
+}
+
+extension View {
+    func attachmentMenu(_ a: Attachment) -> some View { modifier(AttachmentMenu(attachment: a)) }
 }
