@@ -32,20 +32,20 @@ import Testing
 
     @Test func rangeStaysInOrderAndOnThePiano() {
         var ex = ScaleExercise(low: 55, high: 50)
-        #expect([ex.low, ex.high] == [50, 55])
+        #expect(ex.low...ex.high == 50...55)
         ex.setLow(58)
-        #expect([ex.low, ex.high] == [58, 58])
+        #expect(ex.low...ex.high == 58...58)
         ex.setHigh(40)
-        #expect([ex.low, ex.high] == [40, 40])
+        #expect(ex.low...ex.high == 40...40)
         ex.setLow(0)
         ex.setHigh(200)
-        #expect([ex.low, ex.high] == [36, 72])
+        #expect(ex.low...ex.high == 36...72)
     }
 
     @Test func decodingClampsABadRange() throws {
         let json = #"{"pattern":"fiveNote","low":90,"high":10,"direction":"up","speed":"fast"}"#
         let ex = try JSONDecoder().decode(ScaleExercise.self, from: Data(json.utf8))
-        #expect([ex.low, ex.high] == [36, 72])
+        #expect(ex.low...ex.high == 36...72)
         let back = try JSONDecoder().decode(ScaleExercise.self, from: JSONEncoder().encode(ex))
         #expect(back == ex)
     }
