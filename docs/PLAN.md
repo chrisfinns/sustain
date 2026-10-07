@@ -13,7 +13,7 @@ Decisions made:
 - **Areas are optional and user-editable** (feedback on the mockup): at most one area per item, and you can skip it. Pick from suggestions or type a new one. Rename, recolor, merge or delete areas in Settings.
 - **Warm-up is a per-item setting, not an area:** Regular / Focus / Warm-up, which replaces the Focus checkbox. Changing areas can never change Today.
 
-Repo: `chrisfinns/sustain`, branch `claude/gallant-gauss-7axdni`. So far it only has `docs/PLAN.md`. The mockup is at https://claude.ai/artifact/TSe1AHctNW6q3tCF7dqDYC (source in the scratchpad at `sustain-canvas/project/Main.dc.html`).
+Repo: `chrisfinns/sustain`, branch `main`. So far it only has `docs/PLAN.md`. The mockup is at https://claude.ai/artifact/TSe1AHctNW6q3tCF7dqDYC (source in the scratchpad at `sustain-canvas/project/Main.dc.html`).
 
 ## Revision 5 (done Oct 6): canvas comment round, simplifying v1
 Chris left 8 comments on the canvas. Decisions, now applied to the mockup:
@@ -62,7 +62,7 @@ Steps:
    - contrast rules: text ≥ 7:1, small text ≥ 4.5:1, dots ≥ 3:1;
    - "area/instrument colors are names, resolved per mode";
    - in the real app, tokens become CSS custom properties set on `:root` for `prefers-color-scheme`, plus a manual override.
-   Then commit and push to `claude/gallant-gauss-7axdni`.
+   Then commit and push to `main`.
 6. **When Chris says his edits are done:**
    - read every changed `.dc.html` from the canvas (`list` with `scope: "files"`, then `read` with `path`);
    - diff against the scratchpad copies;
@@ -130,7 +130,7 @@ Chris asked to see the color directions and chose **both modes, following the sy
 
 ## This revision: what gets done now
 1. Update the clickable mockup (`Main.dc.html`) to the new Capture, Areas and Warm-up design (see "Mockup changes" below), then republish to the same Artifact URL.
-2. Copy this plan to `docs/PLAN.md`, commit and push to `claude/gallant-gauss-7axdni`.
+2. Copy this plan to `docs/PLAN.md`, commit and push to `main`.
 3. No app code yet. M0 still waits for sign-off on the mockup.
 
 ## Product principles

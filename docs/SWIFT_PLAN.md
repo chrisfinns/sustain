@@ -10,7 +10,7 @@ What it builds on:
 This replaces the Delivery, Stack, Structure, Roadmap and Verification sections of `docs/PLAN.md`, which describe the old PWA.
 
 ## Status (Oct 6)
-M0 is built on `claude/gallant-gauss-7axdni`. CI is green on both Linux (Core) and macOS 26 (the app).
+M0 is built on `main`. CI is green on both Linux (Core) and macOS 26 (the app).
 
 - **Done:**
   - **SustainCore:** FSRS port matching ts-fsrs on 1,566 golden steps; Today queue, lanes, streak and heatmap; area rules; Paper & Ink theme matching the mockup's tokens, plus the contrast gate; link parsing; backup format v1.
