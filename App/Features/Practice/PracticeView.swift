@@ -219,21 +219,31 @@ struct PracticeView: View {
                     .font(Typo.small)
                     .help("Attach a PDF, image or audio file. You can also drop files here or paste with ⌘V.")
             }
-            switch tab {
-            case .video:
-                if item.youtubeId != nil {
-                    VideoPanel(item: item, player: player)
-                } else {
-                    AddVideoPanel(item: item)
+            Group {
+                switch tab {
+                case .video:
+                    if item.youtubeId != nil {
+                        VideoPanel(item: item, player: player)
+                    } else {
+                        AddVideoPanel(item: item)
+                    }
+                case .pdf:
+                    AttachmentList(attachments: pdfs, emptyTitle: "No PDF yet",
+                                   emptyText: "Drop a tab, chart or sheet-music PDF here. The built-in viewer arrives in the next update; for now it opens in Preview.")
+                case .images:
+                    ImageGrid(attachments: images) { paste(into: item) }
+                case .takes:
+                    AttachmentList(attachments: takes, emptyTitle: "No takes yet",
+                                   emptyText: "Record one when it feels clean so you have something to compare against later. Recording arrives in a later update; for now, drop audio files here.")
                 }
-            case .pdf:
-                AttachmentList(attachments: pdfs, emptyTitle: "No PDF yet",
-                               emptyText: "Drop a tab, chart or sheet-music PDF here. The built-in viewer arrives in the next update; for now it opens in Preview.")
-            case .images:
-                ImageGrid(attachments: images) { paste(into: item) }
-            case .takes:
-                AttachmentList(attachments: takes, emptyTitle: "No takes yet",
-                               emptyText: "Record one when it feels clean so you have something to compare against later. Recording arrives in a later update; for now, drop audio files here.")
+            }
+            // Highlight only the panel, not the tab row; the whole block still accepts the drop.
+            .overlay {
+                if dropTargeted {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(theme[.accent], style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                        .allowsHitTesting(false)
+                }
             }
         }
         .dropDestination(for: URL.self) { urls, _ in
@@ -242,13 +252,6 @@ struct PracticeView: View {
             add(files: files, to: item)
             return true
         } isTargeted: { dropTargeted = $0 }
-        .overlay {
-            if dropTargeted {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(theme[.accent], style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
-                    .allowsHitTesting(false)
-            }
-        }
     }
 
     // MARK: - Adding media
