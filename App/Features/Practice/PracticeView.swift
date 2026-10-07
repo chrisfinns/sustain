@@ -4,7 +4,7 @@ import SwiftUI
 import SustainCore
 
 /// The practice card: media on the left, notes on the right, four rating buttons below.
-/// Keys: 1–4 rate (1–2 in Simple mode), Space play/pause, L loop, ←/→ previous/next item.
+/// Keys: 1–4 rate (1–2 in Simple mode), Space play/pause (the video, or the scales on the Scales tab), L loop, ←/→ previous/next item.
 struct PracticeView: View {
     @Environment(\.theme) private var theme
     @Environment(AppModel.self) private var app
@@ -12,6 +12,7 @@ struct PracticeView: View {
     @Query private var areas: [Area]
 
     @State private var player = YouTubePlayerModel()
+    @State private var scales = ScalePlayer()
     @State private var tab: MediaTab = .video
     @State private var pickerOpen = false
     @State private var areaText = ""
@@ -23,7 +24,12 @@ struct PracticeView: View {
     @FocusState private var cardFocused: Bool
 
     enum MediaTab: String, CaseIterable {
-        case video = "Video", pdf = "Tab / PDF", images = "Images", takes = "Takes"
+        case video = "Video", scales = "Scales", pdf = "Tab / PDF", images = "Images", takes = "Takes"
+
+        /// The Scales tab is for singing, so only Voice items have it.
+        static func tabs(for item: Item) -> [MediaTab] {
+            allCases.filter { $0 != .scales || item.instrument?.id == "voice" }
+        }
     }
 
     var body: some View {
@@ -32,6 +38,8 @@ struct PracticeView: View {
                 .id(item.id)
                 .onAppear { setUp(item) }
                 .onChange(of: session.currentId) { if let next = items.first(where: { $0.id == session.currentId }) { setUp(next) } }
+                .onChange(of: tab) { if tab != .scales { scales.stop() } }
+                .onDisappear { scales.shutdown() }
         } else {
             Text("Nothing to practice. Start a session from Today.")
                 .foregroundStyle(theme[.muted])
@@ -190,9 +198,10 @@ struct PracticeView: View {
         let takes = atts.filter { $0.kind == .audio }
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
-                ForEach(MediaTab.allCases, id: \.self) { t in
+                ForEach(MediaTab.tabs(for: item), id: \.self) { t in
                     let count: String = switch t {
                     case .video: item.youtubeId == nil ? "" : "1"
+                    case .scales: ""
                     case .pdf: pdfs.isEmpty ? "" : "\(pdfs.count)"
                     case .images: images.isEmpty ? "" : "\(images.count)"
                     case .takes: takes.isEmpty ? "" : "\(takes.count)"
@@ -227,6 +236,8 @@ struct PracticeView: View {
                     } else {
                         AddVideoPanel(item: item)
                     }
+                case .scales:
+                    ScalesPanel(player: scales)
                 case .pdf:
                     AttachmentList(attachments: pdfs, emptyTitle: "No PDF yet",
                                    emptyText: "Drop a tab, chart or sheet-music PDF here. The built-in viewer arrives in the next update; for now it opens in Preview.")
@@ -390,11 +401,14 @@ struct PracticeView: View {
     private func setUp(_ item: Item) {
         pickerOpen = false
         areaText = ""
+        scales.stop()
         let atts = item.attachments ?? []
+        // Media first; a Voice item with nothing attached opens on Scales.
         tab = item.youtubeId != nil ? .video
             : atts.contains { $0.kind == .pdf || $0.kind == .file } ? .pdf
             : atts.contains { $0.kind == .image } ? .images
-            : atts.contains { $0.kind == .audio } ? .takes : .video
+            : atts.contains { $0.kind == .audio } ? .takes
+            : MediaTab.tabs(for: item).contains(.scales) ? .scales : .video
         if let id = item.youtubeId {
             player.load(videoId: id, start: Int(item.loopA ?? 0))
             player.loopA = item.loopA
@@ -434,7 +448,11 @@ struct PracticeView: View {
         }
         switch press.key {
         case .space:
-            player.togglePlay()
+            if tab == .scales {
+                scales.toggle(app.settings.scales)
+            } else {
+                player.togglePlay()
+            }
             return .handled
         case .leftArrow:
             app.move(by: -1)

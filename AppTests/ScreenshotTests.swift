@@ -55,4 +55,25 @@ struct ScreenshotTests {
         print("Wrote \(written) screenshots to \(Self.outputDir.path)")
         #expect(written == shots.count * 2)
     }
+
+    /// The Scales tab on its own: the practice card picks its tab on appear, which an offscreen render never runs.
+    @Test func renderScalesPanel() throws {
+        let container = try Store.makeContainer(inMemory: true)
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "sustain.snapshots.\(UUID().uuidString)")!)
+        let app = AppModel(container: container, settings: settings, media: nil)
+        try FileManager.default.createDirectory(at: Self.outputDir, withIntermediateDirectories: true)
+        for scheme in [ColorScheme.dark, .light] {
+            let view = ScalesPanel(player: ScalePlayer())
+                .padding(24)
+                .themed()
+                .environment(\.colorScheme, scheme)
+                .environment(\.isSnapshot, true)
+                .environment(app)
+                .frame(width: 760)
+            let renderer = ImageRenderer(content: view)
+            renderer.scale = 2
+            let png = try #require(renderer.nsImage?.tiffRepresentation.flatMap { NSBitmapImageRep(data: $0)?.representation(using: .png, properties: [:]) })
+            try png.write(to: Self.outputDir.appending(path: "6-scales-\(scheme == .dark ? "dark" : "light").png"))
+        }
+    }
 }

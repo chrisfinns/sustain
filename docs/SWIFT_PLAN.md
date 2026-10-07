@@ -255,6 +255,7 @@ CloudKit-safe from day one, so iCloud sync later is a switch and not a migration
 5. **The new cap counts new items already started today**, so "3 of 3" can't be bypassed by finishing them.
 6. **No metronome and no BPM anywhere**, per Revision 5. The mockup's leftover metronome and BPM state isn't ported.
 7. **Instruments:** renaming, recoloring and deleting them isn't in the mockup, so it's left for later (right-click on the chip).
+8. **Scales tab on Voice items** (added Oct 7, Chris's request). A piano plays a vocal warm-up: the chord, then the pattern to sing along with, then up a half step, across the starting notes you pick. Six major patterns, Up / Down / Up & back, and Slow / Medium / Fast (words, no BPM). Hold a key on the keyboard to hear one note. It uses the General MIDI piano built into macOS (`AVAudioUnitSampler`), so nothing is bundled. The settings are one global preference, not per item, so there's no schema change. Logic is in `SustainCore/Scales`; tested on Linux.
 
 ## Milestones (each ends with something Chris uses)
 

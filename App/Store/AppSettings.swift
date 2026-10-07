@@ -14,6 +14,8 @@ final class AppSettings {
     var simple: Bool { didSet { defaults.set(simple, forKey: Keys.simple) } }
     var mode: ModeSetting { didSet { defaults.set(mode.rawValue, forKey: Keys.mode) } }
     var lastBackupAt: Date? { didSet { defaults.set(lastBackupAt, forKey: Keys.lastBackupAt) } }
+    /// The Scales tab's exercise, as last set. A preference, so it isn't in backups.
+    var scales: ScaleExercise { didSet { defaults.set(try? JSONEncoder().encode(scales), forKey: Keys.scales) } }
 
     private enum Keys {
         static let retention = "retention"
@@ -22,6 +24,7 @@ final class AppSettings {
         static let simple = "simple"
         static let mode = "mode"
         static let lastBackupAt = "lastBackupAt"
+        static let scales = "scales"
     }
 
     init(defaults: UserDefaults = .standard) {
@@ -35,6 +38,7 @@ final class AppSettings {
         simple = defaults.bool(forKey: Keys.simple)
         mode = ModeSetting(rawValue: defaults.string(forKey: Keys.mode) ?? "") ?? .system
         lastBackupAt = defaults.object(forKey: Keys.lastBackupAt) as? Date
+        scales = defaults.data(forKey: Keys.scales).flatMap { try? JSONDecoder().decode(ScaleExercise.self, from: $0) } ?? ScaleExercise()
     }
 
     var scheduler: SchedulerSettings {
