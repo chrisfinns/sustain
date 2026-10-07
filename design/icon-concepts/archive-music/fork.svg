@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a struck tuning fork, still ringing</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2622"/>
+      <stop offset="1" stop-color="#0E0C0B"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="brass" gradientUnits="userSpaceOnUse" x1="400" y1="250" x2="640" y2="820">
+      <stop offset="0" stop-color="#F7DCA4"/>
+      <stop offset=".5" stop-color="#D9A55E"/>
+      <stop offset="1" stop-color="#8E5E27"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <g transform="rotate(-12 512 540)">
+    <!-- the ring: two arcs each side, the outer one fainter -->
+    <path d="M378 300 Q332 390 378 480" fill="none" stroke="#E8876D" stroke-width="20" stroke-linecap="round"/>
+    <path d="M646 300 Q692 390 646 480" fill="none" stroke="#E8876D" stroke-width="20" stroke-linecap="round"/>
+    <path d="M318 270 Q250 390 318 510" fill="none" stroke="#E8876D" stroke-opacity=".45" stroke-width="20" stroke-linecap="round"/>
+    <path d="M706 270 Q774 390 706 510" fill="none" stroke="#E8876D" stroke-opacity=".45" stroke-width="20" stroke-linecap="round"/>
+    <!-- tines and yoke -->
+    <path d="M452 286 L452 556 A60 60 0 0 0 572 556 L572 286" fill="none" stroke="url(#brass)" stroke-width="52" stroke-linecap="round"/>
+    <!-- stem and foot -->
+    <path d="M512 616 L512 760" fill="none" stroke="url(#brass)" stroke-width="44" stroke-linecap="round"/>
+    <circle cx="512" cy="786" r="32" fill="url(#brass)"/>
+  </g>
+</svg>

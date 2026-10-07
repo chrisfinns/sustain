@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a spinning top that keeps going</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2622"/>
+      <stop offset="1" stop-color="#0E0C0B"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="body" gradientUnits="userSpaceOnUse" x1="330" y1="0" x2="700" y2="0">
+      <stop offset="0" stop-color="#F29A76"/>
+      <stop offset=".55" stop-color="#D2603F"/>
+      <stop offset="1" stop-color="#8E3420"/>
+    </linearGradient>
+    <linearGradient id="brass" gradientUnits="userSpaceOnUse" x1="490" y1="0" x2="534" y2="0">
+      <stop offset="0" stop-color="#F7DCA4"/>
+      <stop offset="1" stop-color="#A9742F"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#E8876D" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#E8876D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <ellipse cx="512" cy="760" rx="170" ry="30" fill="url(#shadow)"/>
+  <g transform="rotate(8 512 740)">
+    <rect x="494" y="292" width="36" height="128" rx="18" fill="url(#brass)"/>
+    <path d="M512 742 C462 708 326 616 326 534 C326 458 420 404 512 404 C604 404 698 458 698 534 C698 616 562 708 512 742 Z" fill="url(#body)"/>
+    <path d="M338 500 C420 524 604 524 686 500" fill="none" stroke="#F2EADB" stroke-opacity=".85" stroke-width="20" stroke-linecap="round"/>
+    <path d="M362 600 C440 620 584 620 662 600" fill="none" stroke="#F2EADB" stroke-opacity=".5" stroke-width="14" stroke-linecap="round"/>
+  </g>
+</svg>

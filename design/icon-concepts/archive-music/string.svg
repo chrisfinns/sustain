@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a plucked string, still vibrating</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2622"/>
+      <stop offset="1" stop-color="#0E0C0B"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="brass" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="0" y2="824">
+      <stop offset="0" stop-color="#F7DCA4"/>
+      <stop offset=".5" stop-color="#D9A55E"/>
+      <stop offset="1" stop-color="#95632A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <!-- the blur of the vibration: three nested lenses -->
+  <path d="M512 232 Q672 512 512 792 Q352 512 512 232 Z" fill="#E8876D" fill-opacity=".18"/>
+  <path d="M512 232 Q622 512 512 792 Q402 512 512 232 Z" fill="#E8876D" fill-opacity=".32"/>
+  <path d="M512 232 Q572 512 512 792 Q452 512 512 232 Z" fill="#E8876D" fill-opacity=".6"/>
+  <!-- the string, nut to bridge -->
+  <path d="M512 214 L512 810" fill="none" stroke="url(#brass)" stroke-width="16" stroke-linecap="round"/>
+  <rect x="432" y="196" width="160" height="36" rx="18" fill="url(#brass)"/>
+  <rect x="432" y="792" width="160" height="36" rx="18" fill="url(#brass)"/>
+</svg>

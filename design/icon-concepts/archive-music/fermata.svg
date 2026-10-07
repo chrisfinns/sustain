@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a brass fermata over a glowing note</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46211A"/>
+      <stop offset="1" stop-color="#150907"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".18"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="brass" gradientUnits="userSpaceOnUse" x1="0" y1="380" x2="0" y2="620">
+      <stop offset="0" stop-color="#F7DCA4"/>
+      <stop offset=".55" stop-color="#D9A55E"/>
+      <stop offset="1" stop-color="#9C6A2E"/>
+    </linearGradient>
+    <radialGradient id="note" cx=".4" cy=".35" r=".7">
+      <stop offset="0" stop-color="#FFE6D8"/>
+      <stop offset=".45" stop-color="#F29A7C"/>
+      <stop offset="1" stop-color="#B9472C"/>
+    </radialGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#E8876D" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#E8876D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <circle cx="512" cy="586" r="150" fill="url(#halo)"/>
+  <path d="M330 586 A182 182 0 0 1 694 586" fill="none" stroke="url(#brass)" stroke-width="46" stroke-linecap="round"/>
+  <circle cx="512" cy="586" r="60" fill="url(#note)"/>
+</svg>

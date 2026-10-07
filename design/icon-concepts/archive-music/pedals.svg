@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: the right pedal, held down</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2622"/>
+      <stop offset="1" stop-color="#0E0C0B"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- pedals come out of the dark under the piano: dark at the back, lit at the front -->
+    <linearGradient id="brass" gradientUnits="userSpaceOnUse" x1="0" y1="250" x2="0" y2="760">
+      <stop offset="0" stop-color="#5A3C1C" stop-opacity="0"/>
+      <stop offset=".3" stop-color="#9C6A2E"/>
+      <stop offset=".8" stop-color="#E9C07E"/>
+      <stop offset="1" stop-color="#F7DCA4"/>
+    </linearGradient>
+    <linearGradient id="steel" gradientUnits="userSpaceOnUse" x1="0" y1="250" x2="0" y2="720">
+      <stop offset="0" stop-color="#3A3430" stop-opacity="0"/>
+      <stop offset=".35" stop-color="#3A3430"/>
+      <stop offset="1" stop-color="#6A615A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#E8876D" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#E8876D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <ellipse cx="652" cy="736" rx="150" ry="36" fill="url(#glow)"/>
+  <!-- soft and sostenuto pedals, at rest -->
+  <path d="M332 270 L402 270 L432 632 A70 70 0 0 1 302 632 Z" fill="url(#steel)"/>
+  <path d="M477 270 L547 270 L577 632 A70 70 0 0 1 447 632 Z" fill="url(#steel)"/>
+  <!-- sustain pedal, pressed and held -->
+  <path d="M617 300 L687 300 L717 676 A70 70 0 0 1 587 676 Z" fill="url(#brass)"/>
+</svg>

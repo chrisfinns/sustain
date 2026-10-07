@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a synth's sustain knob, turned up</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EEE9E1"/>
+      <stop offset="1" stop-color="#CFC8BD"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx=".5" cy=".5" r=".5">
+      <stop offset=".6" stop-color="#3A3029" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#3A3029" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F08A63"/>
+      <stop offset="1" stop-color="#B9472C"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F59A76"/>
+      <stop offset="1" stop-color="#D2603F"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <!-- scale: lit up to the knob's position, unlit after -->
+  <g fill="#2A2522">
+    <circle cx="300" cy="712" r="18"/>
+    <circle cx="246" cy="586" r="18"/>
+    <circle cx="246" cy="446" r="18"/>
+    <circle cx="300" cy="320" r="18"/>
+    <circle cx="400" cy="234" r="18"/>
+    <circle cx="512" cy="204" r="18"/>
+    <circle cx="624" cy="234" r="18"/>
+  </g>
+  <g fill="#ADA597">
+    <circle cx="724" cy="320" r="18"/>
+    <circle cx="778" cy="446" r="18"/>
+    <circle cx="778" cy="586" r="18"/>
+    <circle cx="724" cy="712" r="18"/>
+  </g>
+  <!-- the knob -->
+  <circle cx="512" cy="540" r="236" fill="url(#shadow)"/>
+  <circle cx="512" cy="516" r="196" fill="url(#cap)"/>
+  <circle cx="512" cy="506" r="168" fill="url(#face)"/>
+  <!-- pointer, at about two o'clock -->
+  <path d="M566 412 L610 336" fill="none" stroke="#FBF5EC" stroke-width="30" stroke-linecap="round"/>
+</svg>

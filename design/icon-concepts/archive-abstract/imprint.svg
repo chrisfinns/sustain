@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a press held into clay, it leaves a mark</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D8774E"/>
+      <stop offset="1" stop-color="#A2472A"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".3"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- light from above: the upper wall of the groove is in shadow, the lower wall catches light -->
+    <linearGradient id="wall" gradientUnits="userSpaceOnUse" x1="0" y1="416" x2="0" y2="608">
+      <stop offset="0" stop-color="#5E2310"/>
+      <stop offset=".55" stop-color="#8A3A1F"/>
+      <stop offset="1" stop-color="#E79A74"/>
+    </linearGradient>
+    <linearGradient id="floor" gradientUnits="userSpaceOnUse" x1="0" y1="440" x2="0" y2="600">
+      <stop offset="0" stop-color="#8E3B20"/>
+      <stop offset="1" stop-color="#B9552F"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <!-- the fingertip press, then the long held drag -->
+  <path d="M404 446 L719 446 A66 66 0 0 1 719 578 L404 578 A96 96 0 1 1 404 446 Z" fill="url(#wall)"/>
+  <path d="M396 466 L719 466 A54 54 0 0 1 719 574 L396 574 A80 80 0 1 1 396 466 Z" fill="url(#floor)"/>
+</svg>

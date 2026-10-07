@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: an ember you keep alive</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241F1C"/>
+      <stop offset="1" stop-color="#0B0908"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".14"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#E8763F" stop-opacity=".45"/>
+      <stop offset=".6" stop-color="#E8763F" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#E8763F" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="coal" cx=".46" cy=".42" r=".62">
+      <stop offset="0" stop-color="#FFF3DC"/>
+      <stop offset=".3" stop-color="#FFC07C"/>
+      <stop offset=".65" stop-color="#E8703C"/>
+      <stop offset="1" stop-color="#7E2614"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <circle cx="512" cy="520" r="330" fill="url(#halo)"/>
+  <!-- a soft, slightly uneven pebble of heat -->
+  <path d="M520 352 C640 356 700 432 696 526 C692 626 612 688 506 684 C398 680 328 610 332 516 C336 424 404 348 520 352 Z" fill="url(#coal)"/>
+</svg>

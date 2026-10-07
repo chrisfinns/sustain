@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: an S drawn into clay, it leaves a mark</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D8774E"/>
+      <stop offset="1" stop-color="#A2472A"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".3"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="floor" gradientUnits="userSpaceOnUse" x1="0" y1="280" x2="0" y2="740">
+      <stop offset="0" stop-color="#9A4221"/>
+      <stop offset="1" stop-color="#B4502C"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <!-- engraved: a lit lower lip, a shadowed wall, then the floor of the groove set slightly lower -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M660 318 C590 270 404 284 400 398 C396 500 628 494 632 612 C636 728 446 748 362 690" stroke="#F6BB98" stroke-opacity=".75" stroke-width="80" transform="translate(0 7)"/>
+    <path d="M660 318 C590 270 404 284 400 398 C396 500 628 494 632 612 C636 728 446 748 362 690" stroke="#5E220F" stroke-width="80"/>
+    <path d="M660 318 C590 270 404 284 400 398 C396 500 628 494 632 612 C636 728 446 748 362 690" stroke="url(#floor)" stroke-width="54" transform="translate(0 10)"/>
+  </g>
+</svg>

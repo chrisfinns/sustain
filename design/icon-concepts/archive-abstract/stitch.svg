@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a running stitch, each return holds it in place</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3ECE1"/>
+      <stop offset="1" stop-color="#DBD0BF"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".8"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <!-- the stitches cast a small shadow on the cloth, then the thread itself; the gaps widen as it goes -->
+  <g fill="none" stroke-linecap="round" stroke-width="36" stroke-dasharray="44 60 44 84 44 118 44 160 44 900">
+    <path d="M250 640 C360 380 600 700 790 400" stroke="#6E5A48" stroke-opacity=".25" transform="translate(0 8)"/>
+    <path d="M250 640 C360 380 600 700 790 400" stroke="#C4552F"/>
+  </g>
+  <circle cx="250" cy="640" r="30" fill="#A9412A"/>
+</svg>

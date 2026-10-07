@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Sustain: a ball that keeps bouncing, each hop longer than the last</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2622"/>
+      <stop offset="1" stop-color="#0E0C0B"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="ball" cx=".38" cy=".32" r=".75">
+      <stop offset="0" stop-color="#FFF4E6"/>
+      <stop offset=".5" stop-color="#F7B98C"/>
+      <stop offset="1" stop-color="#C9573B"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#tile)"/>
+  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  <!-- the hops so far, dotted, warming as they get longer -->
+  <g fill="none" stroke-linecap="round" stroke-width="18" stroke-dasharray="0 34">
+    <path d="M198 700 Q248 590 298 700" stroke="#A9412A"/>
+    <path d="M298 700 Q398 450 498 700" stroke="#D2603F"/>
+    <path d="M498 700 Q640 230 742 520" stroke="#E8876D"/>
+  </g>
+  <!-- where it touched down -->
+  <g fill="#E8876D" fill-opacity=".5">
+    <ellipse cx="298" cy="716" rx="26" ry="6"/>
+    <ellipse cx="498" cy="716" rx="34" ry="7"/>
+  </g>
+  <circle cx="770" cy="566" r="66" fill="url(#ball)"/>
+</svg>
